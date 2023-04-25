@@ -14,53 +14,72 @@ import {
 	PlayArrow,
 	Send,
 	VolumeOff,
+	VolumeOffRounded,
 } from "@mui/icons-material";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { statusPosts } from "@/utils/data";
 
 function StatusView() {
 	let intervals: NodeJS.Timeout[] = [];
 	let index: number = 0;
+	const [paused, setpaused] = useState(false);
 
-	const setActivePlay = (indx: number, trans: string, width: string) => {
+	const setActivePlay = (indx: number, animate: boolean, width: string) => {
 		const play = document.getElementById(`play${indx}`);
 
-		play!.style.transition = trans;
-		play!.style.width = width;
+		play!.style.width = "0px";
+		play!.classList.replace("animate-play", "animate-none");
+
+		if (animate) {
+			setTimeout(() => {
+				play!.style.width = width;
+				play!.classList.replace("animate-none", "animate-play");
+			}, 5);
+		} else {
+			play!.style.width = width;
+		}
 	};
 
 	const setClickedPlay = (indx: number) => {
 		if (indx > index) {
 			intervals.forEach((val) => clearInterval(val));
+			intervals = [];
 
 			for (let i = index; i < indx; i++) {
-				setActivePlay(i, "none", "100%");
+				setActivePlay(i, false, "100%");
 			}
 
-			setActivePlay(indx, "width 5s linear", "100%");
+			setActivePlay(indx, true, "100%");
 
 			startPlay();
 		} else if (indx < index) {
 			intervals.forEach((val) => clearInterval(val));
+			intervals = [];
 
 			for (let i = indx; i <= index; i++) {
-				setActivePlay(i, "none", "0px");
+				setActivePlay(i, false, "0px");
 			}
 
 			setTimeout(() => {
-				setActivePlay(indx, "width 5s linear", "100%");
+				setActivePlay(indx, true, "100%");
 
 				startPlay();
-			}, 10);
+			}, 5);
 		}
+
+		changeImg(indx);
 
 		index = indx;
 	};
 
 	const moveRight = () => {
 		intervals.forEach((val) => clearInterval(val));
+		intervals = [];
 
-		setActivePlay(index, "none", "100%");
-		setActivePlay(index + 1, "width 5s linear", "100%");
+		setActivePlay(index, false, "100%");
+		setActivePlay(index + 1, true, "100%");
+
+		changeImg(index + 1);
 
 		index++;
 		startPlay();
@@ -68,17 +87,58 @@ function StatusView() {
 
 	const moveLeft = () => {
 		intervals.forEach((val) => clearInterval(val));
+		intervals = [];
 
 		for (let i = index - 1; i <= index; i++) {
-			setActivePlay(i, "none", "0px");
+			setActivePlay(i, false, "0px");
 		}
 
 		setTimeout(() => {
-			setActivePlay(index - 1, "width 5s linear", "100%");
+			setActivePlay(index - 1, true, "100%");
+
+			changeImg(index - 1);
 
 			index--;
 			startPlay();
-		}, 10);
+		}, 5);
+	};
+
+	const changeImg = (indx: number) => {
+		const prevBg = document.querySelector(".active.opacity-100");
+		const prevPost = document.querySelector(".activeP.opacity-100");
+		const activeBg = document.getElementById(`bg${indx}`);
+		const activePost = document.getElementById(`post${indx}`);
+
+		if (prevBg !== null && prevPost !== null) {
+			prevBg.classList.remove("active");
+			prevBg.classList.replace("opacity-100", "opacity-0");
+
+			prevPost.classList.remove("activeP");
+			prevPost.classList.replace("opacity-100", "opacity-0");
+		}
+
+		activeBg!.classList.add("active");
+		activeBg!.classList.replace("opacity-0", "opacity-100");
+
+		activePost!.classList.add("activeP");
+		activePost!.classList.replace("opacity-0", "opacity-100");
+	};
+
+	const start = () => {
+		changeImg(index);
+
+		setActivePlay(index, true, "100%");
+
+		startPlay();
+	};
+
+	const pause = () => {
+		intervals.forEach((val) => clearInterval(val));
+		intervals = [];
+
+		const play = document.getElementById(`play${index}`);
+
+		// play!.style.transitionP
 	};
 
 	const startPlay = () => {
@@ -87,44 +147,64 @@ function StatusView() {
 				if (index + 1 < 5) {
 					index++;
 
-					setActivePlay(index, "width 5s linear", "100%");
+					changeImg(index);
+
+					setActivePlay(index, true, "100%");
 				}
 			}, 5000)
 		);
 	};
 
 	useEffect(() => {
-		setActivePlay(index, "width 5s linear", "100%");
-
-		startPlay();
-	// eslint-disable-next-line react-hooks/exhaustive-deps
+		start();
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
 	return (
 		<div className="bg-darker h-full w-full">
 			<div className="w-full h-full relative">
-				<div className="blur-[60px] absolute top-0 left-0 w-full h-full bg-[url(/3bb1.jpg)] opacity-90 bg-no-repeat bg-center bg-cover"></div>
-
-				<div className="w-full flex justify-between items-center absolute top-0 left-0 z-[3] px-[30px] py-[20px]">
-					<ArrowBack sx={{ fontSize: "25px", color: "white" }} />
-
-					<Close sx={{ fontSize: "25px", color: "white" }} />
+				<div className="blur-[60px] absolute top-0 left-0 w-full h-full opacity-90 bg-no-repeat bg-center bg-cover">
+					{statusPosts.map((val, ind) => (
+						<Image
+							src={val.img}
+							key={ind}
+							id={`bg${ind}`}
+							alt={"background"}
+							className="object-cover w-full h-full absolute transition-[opacity] duration-200 opacity-0"
+						/>
+					))}
 				</div>
 
 				<div className="h-full flex justify-center items-center relative z-[1]">
-					<div className="bg-darker h-full relative flex items-end">
-						<Image
-							src={post}
-							alt={"post"}
-							className="h-full w-full object-contain"
-						/>
+					<div className="relative w-full h-full flex items-center justify-center">
+						{statusPosts.map((val, ind) => (
+							<div
+								key={ind}
+								id={`post${ind}`}
+								className="h-full flex items-end absolute opacity-0"
+							>
+								<Image
+									src={val.img}
+									alt={"post"}
+									className="h-full w-full object-contain"
+								/>
 
-						<div className="w-full h-[110px] bg-[#00000042] absolute flex justify-center py-[15px]">
-							<p className="text-[white]">ywuyquwhqwfhh</p>
-						</div>
+								<div className="w-full bg-[#00000042] absolute flex flex-col justify-between items-center py-[15px]">
+									<p className="text-[white]">{val.caption}</p>
+
+									<div className="h-[70px] w-full"></div>
+								</div>
+							</div>
+						))}
 					</div>
 
 					<div className="absolute top-0 left-0 w-full h-full z-[2] flex justify-between">
+						<div className="w-full flex justify-between items-center px-[30px] py-[20px] z-[1] absolute top-0 left-0">
+							<ArrowBack sx={{ fontSize: "25px", color: "white" }} />
+
+							<Close sx={{ fontSize: "25px", color: "white" }} />
+						</div>
+
 						<div className="h-full px-[30px] flex items-center">
 							<div
 								onClick={() => moveLeft()}
@@ -136,8 +216,8 @@ function StatusView() {
 							</div>
 						</div>
 
-						<div className="h-full w-full flex flex-col items-center justify-between py-[20px]">
-							<div className="w-full max-w-[480px] flex flex-col gap-[15px] relative z-[4]">
+						<div className="h-full w-full flex flex-col items-center justify-between py-[20px] relative z-[2]">
+							<div className="w-full max-w-[480px] flex flex-col gap-[15px]">
 								<div className="w-full flex items-center justify-between gap-[5px]">
 									{Array(5)
 										.fill(false)
@@ -148,14 +228,14 @@ function StatusView() {
 												className="flex-1 h-[7px] rounded-[7px] bg-[gray] overflow-hidden"
 											>
 												<span
-													className="w-0 h-full bg-[white] block"
+													className="w-0 h-full bg-[white] block animate-play"
 													id={`play${ind}`}
 												></span>
 											</div>
 										))}
 								</div>
 
-								<div className="w-full flex justify-between">
+								<div className="w-full flex justify-between items-start">
 									<div className="flex-1 flex items-center gap-[15px]">
 										<Image
 											src={post}
@@ -173,17 +253,28 @@ function StatusView() {
 									</div>
 
 									<div className="flex-1 flex items-center justify-end gap-[10px]">
-										{/* <PlayArrow /> */}
-										<Pause sx={{ fontSize: "20px", color: "white" }} />
+										<div className="cursor-pointer">
+											{paused ? (
+												<Pause sx={{ fontSize: "20px", color: "white" }} />
+											) : (
+												<PlayArrow sx={{ fontSize: "20px", color: "white" }} />
+											)}
+										</div>
 
-										<VolumeOff sx={{ fontSize: "20px", color: "white" }} />
+										<div className="cursor-pointer">
+											<VolumeOff
+												sx={{ fontSize: "20px", color: "lightgray" }}
+											/>
+										</div>
 
-										<MoreVert sx={{ fontSize: "20px", color: "white" }} />
+										<div className="cursor-pointer">
+											<MoreVert sx={{ fontSize: "20px", color: "white" }} />
+										</div>
 									</div>
 								</div>
 							</div>
 
-							<div className="w-full max-w-[780px] flex items-center">
+							<div className="w-full max-w-[780px] flex items-center mb-[10px]">
 								<MoodOutlined
 									sx={{ fontSize: "27px", color: "white", marginRight: "15px" }}
 								/>
