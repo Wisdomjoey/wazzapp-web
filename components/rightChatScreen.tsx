@@ -4,11 +4,11 @@ import MessageTyper from "./messageTyper";
 
 function RightChatScreen() {
 	return (
-		<div className="w-ful h-full bg-darker border-l-[1px] border-solid border-l-secondaryBorder flex items-center justify-between flex-col">
+		<div className="h-full bg-darker flex items-center justify-between flex-col">
 			<ChatNavbar />
 
-			<div className="flex-1 w-full flex flex-col-reverse overflow-auto py-[20px] gap-[20px]">
-				<ChatBox />
+			<div className="w-full flex-1 flex flex-col-reverse overflow-auto py-[20px] gap-[20px]">
+				<ChatBox id={0} />
 			</div>
 
 			<MessageTyper />

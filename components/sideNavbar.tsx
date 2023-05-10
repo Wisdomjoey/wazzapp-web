@@ -1,63 +1,80 @@
-"use client";
-
 import Image from "next/image";
 import profile from "../images/profile.png";
 import { Groups, DataUsage, Chat, MoreVert } from "@mui/icons-material";
 import IconBox from "./iconBox";
-import MenuTile from "./menuTile";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import MenuBox from "./menuBox";
+import { addSubRoute } from "@/redux/reducers/routeSlice";
+import { useDispatch } from "react-redux";
 
 function SideNavbar() {
-	const [open, setopen] = useState(false);
+	const dispatch = useDispatch();
+	let [open, setopen] = useState(false);
 
-	const openMenu = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-		const menu = document.getElementById("menu");
-		const tile = document.getElementById("menuTile");
-
+	const openMenu = useCallback(() => {
 		if (!open) {
-			menu!.style.width = "200px";
-			menu!.style.height = "auto";
+			const menu = document.getElementById("menuSn");
+			const tile = document.querySelectorAll("#tileSn");
+
+			menu!.classList.replace("hidden", "flex");
 
 			setTimeout(() => {
-				tile!.style.opacity = "1";
-			}, 84);
+				menu!.classList.replace("scale-0", "scale-100");
 
-			setopen(true);
-		} else {
-			tile!.style.opacity = "0";
-			menu!.style.width = "0px";
-			menu!.style.height = "0px";
+				setTimeout(() => {
+					tile.forEach((val) => {
+						val.classList.replace("opacity-0", "opacity-100");
+					});
 
-			setopen(false);
+					setTimeout(() => {
+						setopen(true);
+					}, 210);
+				}, 200);
+			}, 5);
 		}
-	};
+	}, [open]);
 
-	const closeMenu = (e: MouseEvent) => {
-		const menu = document.getElementById("menu");
-		const tile = document.getElementById("menuTile");
-		const target = e.target as HTMLElement;
+	const closeMenu = useCallback(
+		(e: MouseEvent) => {
+			const menu = document.getElementById("menuSn");
+			const tile = document.querySelectorAll("#tileSn");
+			const target = e.target as HTMLElement;
 
-		if (
-			!["menu", "menuTile", "tile", "menuText", "icon"].includes(target.id) &&
-			target.tagName !== "svg" &&
-			target.tagName !== "path"
-		) {
-			tile!.style.opacity = "0";
-			menu!.style.width = "0px";
-			menu!.style.height = "0px";
+			if (!["menuSn", "menuTileSn"].includes(target.id) && open) {
+				menu!.classList.replace("scale-100", "scale-0");
 
-			setopen(false);
-		}
+				setTimeout(() => {
+					menu!.classList.replace("flex", "hidden");
+
+					tile.forEach((val) => {
+						val.classList.replace("opacity-100", "opacity-0");
+					});
+
+					setopen(false);
+				}, 200);
+			}
+		},
+		[open]
+	);
+
+	const openCommunity = () => {
+		dispatch(addSubRoute("communities"));
+
+		setTimeout(() => {
+			const community = document.getElementById("community");
+
+			community!.classList.replace("w-0", "w-full");
+		}, 5);
 	};
 
 	useEffect(() => {
 		window.addEventListener("click", closeMenu);
 
 		return () => window.removeEventListener("click", closeMenu);
-	}, []);
+	}, [closeMenu]);
 
 	return (
-		<nav className="w-full h-[60px] bg-secondary flex items-center justify-between px-[20px]">
+		<nav className="h-[60px] bg-secondary flex items-center justify-between px-[20px]">
 			<Image
 				src={profile}
 				alt={"profile"}
@@ -67,40 +84,40 @@ function SideNavbar() {
 			/>
 
 			<div className="flex items-center gap-[5px] relative">
-				<IconBox title="Communities">
+				<IconBox title="Communities" clicked={openCommunity}>
 					<Groups sx={{ color: "lightgray", fontSize: "25px" }} />
 				</IconBox>
 
-				<IconBox title="Status">
-					<DataUsage sx={{ color: "lightgray", fontSize: "22px" }} />
+				<IconBox title="Status" clicked={() => dispatch(addSubRoute("status"))}>
+					<DataUsage sx={{ color: "lightgray", fontSize: "21px" }} />
 				</IconBox>
 
-				<IconBox title="New Chat">
-					<Chat sx={{ color: "lightgray", fontSize: "22px" }} />
+				<IconBox
+					title="New Chat"
+					clicked={() => dispatch(addSubRoute("newChat"))}
+				>
+					<Chat sx={{ color: "lightgray", fontSize: "21px" }} />
 				</IconBox>
 
 				<IconBox title="Menu" clicked={openMenu}>
-					<MoreVert sx={{ color: "lightgray", fontSize: "25px" }} />
+					<MoreVert sx={{ color: "lightgray", fontSize: "24px" }} />
 				</IconBox>
 
-				<div
-					id="menu"
-					className="absolute right-0 top-[45px] w-[0px] h-[0px] py-[10px] bg-secondary shadow-shadow z-10 rounded-[4px] [transition:width_0.084s,height_0.05s] ease-out"
-				>
-					<div id="menuTile" className="opacity-0 flex flex-col w-full">
-						{[
-							"New group",
-							"New community",
-							"Archived",
-							"Starred messages",
-							"Select chats",
-							"Settings",
-							"Log out",
-						].map((e, ind) => (
-							<MenuTile key={ind} text={e} />
-						))}
-					</div>
-				</div>
+				<MenuBox
+					width="w-[200px]"
+					height="h-[300px]"
+					origin="origin-top-right"
+					id="Sn"
+					links={[
+						{ text: "New group" },
+						{ text: "New community" },
+						{ text: "Archived" },
+						{ text: "Starred messages" },
+						{ text: "Select chats" },
+						{ text: "Settings" },
+						{ text: "Log out" },
+					]}
+				/>
 			</div>
 		</nav>
 	);

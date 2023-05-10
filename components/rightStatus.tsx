@@ -1,14 +1,19 @@
-"use client";
-
 import { Close, DataUsage } from "@mui/icons-material";
 import IconBox from "./iconBox";
+import { changeRoute } from "@/redux/reducers/routeSlice";
+import { useDispatch } from "react-redux";
 
 function RightStatus() {
+	const dispatch = useDispatch();
+
 	return (
-		<div className="w-full h-full bg-darker">
+		<div className="h-full bg-darker">
 			<div className="h-full">
-				<div className="w-full flex items-center justify-end px-[20px] py-[10px]">
-					<IconBox title={"Close"}>
+				<div className="flex items-center justify-end px-[20px] py-[10px]">
+					<IconBox
+						title={"Close"}
+						clicked={() => dispatch(changeRoute("home"))}
+					>
 						<Close sx={{ color: "white", fontSize: "25px" }} />
 					</IconBox>
 				</div>

@@ -2,19 +2,36 @@ import ChatTile from "./chatTile";
 import SearchHeader from "./searchHeader";
 import SideNavbar from "./sideNavbar";
 import pic from "../images/profile.png";
+import { useDispatch } from "react-redux";
+import { addSubRoute, removeSubRoute } from "@/redux/reducers/routeSlice";
 
 function LeftChats() {
+	const dispatch = useDispatch();
+
+	const openChat = () => {
+		dispatch(removeSubRoute("intro"));
+		dispatch(addSubRoute("chat"));
+	};
+
 	return (
-		<div className="h-full w-full flex flex-col">
+		<div className="h-full flex flex-col border-r-[1px] border-solid border-r-secondaryBorder transition-all duration-200">
 			<SideNavbar />
 
-			<div className="w-full bg-darker h-[calc(100%-60px)] flex flex-col">
-				<SearchHeader />
+			<div className="bg-darker h-[calc(100%-60px)] flex flex-col">
+				<SearchHeader holder="Search or start new chat" id="ch" />
 
-				<div className="h-[calc(100%-44px)] w-full overflow-auto">
-					<div className="w-full flex flex-col items-start pb-[25px]">
-						{[1, 2, 3, 4, 5, 6, 7, 8, 9, 0].map((e) => (
-							<ChatTile key={e} id={`${e}`} pic={pic} />
+				<div className="h-[calc(100%-44px)] overflow-y-auto">
+					<div className="flex flex-col items-start pb-[25px]">
+						{[1, 2, 3, 4, 5, 6, 7, 8, 9, 0].map((e, ind) => (
+							<ChatTile
+								key={e}
+								id={ind}
+								pic={pic}
+								name="Hashira Hoshi"
+								lastMsg="Hello! wassup"
+								msgCount={10}
+								clicked={openChat}
+							/>
 						))}
 					</div>
 				</div>

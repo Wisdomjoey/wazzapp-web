@@ -1,18 +1,18 @@
-"use client";
-
 import { FilterList, Search, West } from "@mui/icons-material";
 import { useState } from "react";
 
 type Props = {
 	showFilter?: boolean;
+	holder: string;
+	id: string;
 };
 
-function SearchHeader({ showFilter = true }: Props) {
+function SearchHeader({ showFilter = true, holder, id }: Props) {
 	const [filteron, setfilteron] = useState(false);
 
 	const focused = () => {
-		const search = document.getElementById("searchIcon");
-		const arrow = document.getElementById("arrowIcon");
+		const search = document.getElementById(`searchIcon${id}`);
+		const arrow = document.getElementById(`arrowIcon${id}`);
 
 		search!.style.transform = "rotate(-180deg)";
 		search!.style.opacity = "0";
@@ -22,8 +22,8 @@ function SearchHeader({ showFilter = true }: Props) {
 	};
 
 	const blurred = () => {
-		const search = document.getElementById("searchIcon");
-		const arrow = document.getElementById("arrowIcon");
+		const search = document.getElementById(`searchIcon${id}`);
+		const arrow = document.getElementById(`arrowIcon${id}`);
 
 		arrow!.style.transform = "rotate(180deg)";
 		arrow!.style.opacity = "0";
@@ -53,10 +53,10 @@ function SearchHeader({ showFilter = true }: Props) {
 	};
 
 	return (
-		<div className="w-full px-[10px] py-[6px] flex gap-[10px] items-center">
+		<div className="px-[10px] py-[6px] flex gap-[10px] items-center">
 			<div className="flex-1 h-[32px] rounded-[7px] bg-secondary flex items-center px-[20px] gap-[30px] relative">
 				<Search
-					id="searchIcon"
+					id={`searchIcon${id}`}
 					sx={{
 						fontSize: "19px",
 						color: "lightgray",
@@ -67,7 +67,7 @@ function SearchHeader({ showFilter = true }: Props) {
 				<West
 					onClick={unfocus}
 					className="text-primary"
-					id="arrowIcon"
+					id={`arrowIcon${id}`}
 					sx={{
 						fontSize: "20px",
 						position: "absolute",
@@ -84,7 +84,7 @@ function SearchHeader({ showFilter = true }: Props) {
 					id="input"
 					type="text"
 					className="flex-1 bg-[transparent] border-none outline-none leading-[2] placeholder:opacity-[.7] text-[13px] text-[lightgray]"
-					placeholder="Search or start new chat"
+					placeholder={holder}
 				/>
 			</div>
 

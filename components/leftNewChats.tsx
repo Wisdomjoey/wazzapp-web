@@ -9,21 +9,21 @@ import pic from "../images/profile.png";
 
 function LeftNewChats() {
 	return (
-		<div className="w-full h-full">
+		<div className="h-full">
 			<NewChatNav text="New chat" />
 
-			<div className="w-full h-[calc(100%-120px)] bg-darker">
-				<SearchHeader showFilter={false} />
+			<div className="h-[calc(100%-120px)] bg-darker">
+				<SearchHeader showFilter={false} holder={""} id={""} />
 
-				<div className="h-[calc(100%-44px)] w-full overflow-auto">
-					<div className="w-full flex flex-col items-start pb-[25px]">
+				<div className="h-[calc(100%-44px)] overflow-auto">
+					<div className="flex flex-col items-start pb-[25px]">
 						{[
 							{ icon: Group, text: "New group" },
 							{ icon: Groups, text: "New community" },
 						].map((e, ind) => (
 							<ChatTile
 								key={ind}
-								id={`${e}`}
+								id={ind}
 								Icon={e.icon}
 								text={e.text}
 								showSpan={true}

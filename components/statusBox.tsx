@@ -53,7 +53,7 @@ function StatusBox({ name, time, img, status, id }: Props) {
 	}, [id, status, status.length]);
 
 	return (
-		<div className="flex gap-[15px] items-center w-full cursor-pointer hover:bg-[#ffffff1a] py-[8px] px-[15px]">
+		<div className="flex gap-[15px] items-center cursor-pointer hover:bg-[#ffffff1a] py-[8px] px-[15px]">
 			<div className="w-[50px] h-[50px] relative flex items-center justify-center">
 				<Image
 					alt="Profile pic"

@@ -30,8 +30,8 @@ function LeftStatus() {
 	}, []);
 
 	return (
-		<div className="w-full h-full bg-secondary">
-			<div className="h-[105px] w-full flex items-end pb-[2px]">
+		<div className="h-full bg-secondary">
+			<div className="h-[105px] flex items-end pb-[2px]">
 				<StatusBox
 					name={"My Status"}
 					time={"No updates"}
@@ -41,7 +41,7 @@ function LeftStatus() {
 				/>
 			</div>
 
-			<div className="py-[15px] w-full h-[calc(100%-105px)] overflow-auto">
+			<div className="py-[15px] h-[calc(100%-105px)] overflow-auto">
 				{notSeen.length > 0 && (
 					<>
 						<div className="px-[15px]">
@@ -52,7 +52,7 @@ function LeftStatus() {
 							</div>
 						</div>
 
-						<div className="flex w-full flex-col py-[7px] mb-[10px]">
+						<div className="flex flex-col py-[7px] mb-[10px]">
 							{notSeen.map((e, ind) => (
 								<StatusBox
 									key={ind}
@@ -77,7 +77,7 @@ function LeftStatus() {
 							</div>
 						</div>
 
-						<div className="flex w-full flex-col py-[7px]">
+						<div className="flex flex-col py-[7px]">
 							{seen.map((e, ind) => (
 								<StatusBox
 									key={ind}
