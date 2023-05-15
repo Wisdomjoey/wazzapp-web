@@ -1,8 +1,14 @@
 import { SvgIconTypeMap } from "@mui/material";
 import { OverridableComponent } from "@mui/material/OverridableComponent";
 import Image, { StaticImageData } from "next/image";
-import { MouseEvent, useCallback, useEffect, useState } from "react";
-import MenuBox from "./menuBox";
+import {
+	MouseEvent,
+	useCallback,
+	useEffect,
+	useState,
+	useRef,
+	createRef,
+} from "react";
 
 type Props = {
 	id?: number;
@@ -13,6 +19,8 @@ type Props = {
 	span?: string;
 	pic?: StaticImageData;
 	showSpan?: boolean;
+	tileRefs: React.RefObject<HTMLDivElement>[];
+	menuRef: React.RefObject<HTMLDivElement>;
 	Icon?: OverridableComponent<SvgIconTypeMap<{}, "svg">> & {
 		muiName: string;
 	};
@@ -31,95 +39,102 @@ function ChatTile({
 	pic,
 	showSpan = false,
 	Icon,
+	tileRefs,
+	menuRef,
 	clicked,
 }: Props) {
-	const [open, setopen] = useState(false);
+	const [open, setOpen] = useState(false);
+	const dropRef = useRef<HTMLDivElement>(null);
 
 	const showIcon = () => {
-		const drop = document.getElementById(`drop${id}`);
+		if (dropRef.current !== null) {
+			dropRef.current.classList.replace("hidden", "flex");
 
-		drop!.classList.replace("hidden", "flex");
-
-		setTimeout(() => {
-			drop!.classList.replace("w-0", "w-[20px]");
-			drop!.classList.replace("opacity-0", "opacity-70");
-		}, 5);
+			setTimeout(() => {
+				dropRef.current!.classList.replace("w-0", "w-[20px]");
+				dropRef.current!.classList.replace("opacity-0", "opacity-70");
+			}, 5);
+		}
 	};
 
 	const hideIcon = () => {
-		const drop = document.getElementById(`drop${id}`);
+		if (dropRef.current !== null) {
+			dropRef.current.classList.replace("w-[20px]", "w-0");
+			dropRef.current.classList.replace("opacity-70", "opacity-0");
 
-		drop!.classList.replace("w-[20px]", "w-0");
-		drop!.classList.replace("opacity-70", "opacity-0");
-
-		setTimeout(() => {
-			drop!.classList.replace("flex", "hidden");
-		}, 300);
+			setTimeout(() => {
+				dropRef.current!.classList.replace("flex", "hidden");
+			}, 300);
+		}
 	};
 
 	const openMenu = useCallback(
 		(e: MouseEvent<HTMLDivElement, globalThis.MouseEvent>) => {
 			e.preventDefault();
 
-			if (!open) {
-				const menu = document.getElementById(`menuCh${id}`);
-				const tile = document.querySelectorAll(`#tileCh${id}`);
-
-				menu!.classList.replace("hidden", "flex");
-				menu!.style.left = `${e.clientX}px`;
-				menu!.style.right = "revert";
+			if (!open && menuRef.current !== null) {
+				menuRef.current.classList.replace("hidden", "flex");
+				menuRef.current.style.left = `${e.clientX}px`;
+				menuRef.current.style.right = "revert";
 
 				if (window.innerHeight - e.clientY < 220) {
-					menu!.style.bottom = `${window.innerHeight - e.clientY}px`;
-					menu!.style.top = "revert";
-					menu!.classList.add("origin-bottom-left");
+					menuRef.current.style.bottom = `${window.innerHeight - e.clientY}px`;
+					menuRef.current.style.top = "revert";
+					menuRef.current.classList.add("origin-bottom-left");
 				} else {
-					menu!.style.top = `${e.clientY}px`;
-					menu!.style.bottom = "revert";
-					menu!.classList.add("origin-top-left");
+					menuRef.current.style.top = `${e.clientY}px`;
+					menuRef.current.style.bottom = "revert";
+					menuRef.current.classList.add("origin-top-left");
 				}
 
 				setTimeout(() => {
-					menu!.classList.replace("scale-0", "scale-100");
+					menuRef.current!.classList.replace("scale-0", "scale-100");
 
 					setTimeout(() => {
-						tile.forEach((val) => {
-							val.classList.replace("opacity-0", "opacity-100");
+						tileRefs.forEach((val) => {
+							console.log(tileRefs);
+							if (val.current !== null) {
+								val.current.classList.replace("opacity-0", "opacity-100");
+							}
 						});
 
 						setTimeout(() => {
-							setopen(true);
+							setOpen(true);
 						}, 150);
 					}, 200);
 				}, 5);
 			}
 		},
-		[id, open]
+		[menuRef, open, tileRefs]
 	);
 
 	const closeMenu = useCallback(
 		(e: globalThis.MouseEvent) => {
-			const menu = document.getElementById(`menuCh${id}`);
-			const tile = document.querySelectorAll(`#tileCh${id}`);
 			const target = e.target as HTMLElement;
 
-			if (![`menuCh${id}`, `menuTileCh${id}`].includes(target.id) && open) {
-				menu!.classList.replace("scale-100", "scale-0");
+			if (
+				![`menuCh${id}`, `menuTileCh${id}`].includes(target.id) &&
+				open &&
+				menuRef.current !== null
+			) {
+				menuRef.current.classList.replace("scale-100", "scale-0");
 
 				setTimeout(() => {
-					menu!.classList.replace("flex", "hidden");
-					menu!.classList.remove("origin-top-left");
-					menu!.classList.remove("origin-bottom-left");
+					menuRef.current!.classList.replace("flex", "hidden");
+					menuRef.current!.classList.remove("origin-top-left");
+					menuRef.current!.classList.remove("origin-bottom-left");
 
-					tile.forEach((val) => {
-						val.classList.replace("opacity-100", "opacity-0");
+					tileRefs.forEach((val) => {
+						if (val.current !== null) {
+							val.current.classList.replace("opacity-100", "opacity-0");
+						}
 					});
 
-					setopen(false);
+					setOpen(false);
 				}, 200);
 			}
 		},
-		[id, open]
+		[id, menuRef, open, tileRefs]
 	);
 
 	useEffect(() => {
@@ -129,7 +144,7 @@ function ChatTile({
 	}, [closeMenu]);
 
 	return (
-		<div className="w-full flex items-center">
+		<div className="w-full">
 			<div
 				onClick={clicked}
 				onContextMenu={openMenu}
@@ -189,6 +204,7 @@ function ChatTile({
 							<div
 								onClick={openMenu}
 								id={`drop${id}`}
+								ref={dropRef}
 								className="w-0 opacity-0 transition-all duration-[.3s] hidden"
 							>
 								<svg
@@ -211,19 +227,6 @@ function ChatTile({
 					</div>
 				</div>
 			</div>
-
-			<MenuBox
-				width="w-[200px]"
-				height="h-[220px]"
-				id={`Ch${id}`}
-				links={[
-					{ text: "Archive chat" },
-					{ text: "Mute notifications" },
-					{ text: "Exit group" },
-					{ text: "Pin chats" },
-					{ text: "Mark as read" },
-				]}
-			/>
 		</div>
 	);
 }

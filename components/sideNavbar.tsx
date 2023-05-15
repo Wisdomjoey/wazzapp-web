@@ -2,59 +2,66 @@ import Image from "next/image";
 import profile from "../images/profile.png";
 import { Groups, DataUsage, Chat, MoreVert } from "@mui/icons-material";
 import IconBox from "./iconBox";
-import { useCallback, useEffect, useState } from "react";
+import { createRef, useCallback, useEffect, useRef, useState } from "react";
 import MenuBox from "./menuBox";
 import { addSubRoute } from "@/redux/reducers/routeSlice";
 import { useDispatch } from "react-redux";
 
 function SideNavbar() {
 	const dispatch = useDispatch();
-	let [open, setopen] = useState(false);
+	let [open, setOpen] = useState(false);
+	const menuRef = useRef<HTMLDivElement>(null);
+	const tileRefs: React.RefObject<HTMLDivElement>[] = Array(7)
+		.fill(null)
+		.map(() => createRef<HTMLDivElement>());
 
 	const openMenu = useCallback(() => {
-		if (!open) {
-			const menu = document.getElementById("menuSn");
-			const tile = document.querySelectorAll("#tileSn");
-
-			menu!.classList.replace("hidden", "flex");
+		if (!open && menuRef.current !== null) {
+			menuRef.current.classList.replace("hidden", "flex");
 
 			setTimeout(() => {
-				menu!.classList.replace("scale-0", "scale-100");
+				menuRef.current!.classList.replace("scale-0", "scale-100");
 
 				setTimeout(() => {
-					tile.forEach((val) => {
-						val.classList.replace("opacity-0", "opacity-100");
+					tileRefs.forEach((val) => {
+						if (val.current !== null) {
+							val.current.classList.replace("opacity-0", "opacity-100");
+						}
 					});
 
 					setTimeout(() => {
-						setopen(true);
+						setOpen(true);
 					}, 210);
 				}, 200);
 			}, 5);
 		}
-	}, [open]);
+	}, [open, tileRefs]);
 
 	const closeMenu = useCallback(
 		(e: MouseEvent) => {
-			const menu = document.getElementById("menuSn");
-			const tile = document.querySelectorAll("#tileSn");
 			const target = e.target as HTMLElement;
 
-			if (!["menuSn", "menuTileSn"].includes(target.id) && open) {
-				menu!.classList.replace("scale-100", "scale-0");
+			if (
+				!["menuSn", "menuTileSn"].includes(target.id) &&
+				open &&
+				menuRef.current !== null
+			) {
+				menuRef.current.classList.replace("scale-100", "scale-0");
 
 				setTimeout(() => {
-					menu!.classList.replace("flex", "hidden");
+					menuRef.current!.classList.replace("flex", "hidden");
 
-					tile.forEach((val) => {
-						val.classList.replace("opacity-100", "opacity-0");
+					tileRefs.forEach((val) => {
+						if (val.current !== null) {
+							val.current.classList.replace("opacity-100", "opacity-0");
+						}
 					});
 
-					setopen(false);
+					setOpen(false);
 				}, 200);
 			}
 		},
-		[open]
+		[open, tileRefs]
 	);
 
 	const openCommunity = () => {
@@ -63,7 +70,7 @@ function SideNavbar() {
 		setTimeout(() => {
 			const community = document.getElementById("community");
 
-			community!.classList.replace("w-0", "w-full");
+			community!.classList.replace("-translate-x-[100%]", "translate-x-0");
 		}, 5);
 	};
 
@@ -117,6 +124,8 @@ function SideNavbar() {
 						{ text: "Settings" },
 						{ text: "Log out" },
 					]}
+					menuRef={menuRef}
+					tileRefs={tileRefs}
 				/>
 			</div>
 		</nav>

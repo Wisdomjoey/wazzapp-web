@@ -22,14 +22,14 @@ import { statusPosts } from "@/utils/data";
 function StatusView() {
 	let timeouts: NodeJS.Timeout[] = [];
 	let index: number = 0;
-	const [paused, setpaused] = useState(false);
-	const [activeIndx, setactiveIndx] = useState(0);
-	const [slide, setslide] = useState([] as string[]);
+	const [paused, setPaused] = useState(false);
+	const [activeIndx, setActiveIndx] = useState(0);
+	const [slide, setSlide] = useState<string[]>([]);
 
 	const setActivePlay = (indx: number, animate: boolean, width: string) => {
 console.log(indx)
 		if (animate) {
-			setslide((prev) => {
+			setSlide((prev) => {
 				let temp = prev;
 
 				temp[indx] = `animate-play w-[${width}]`;
@@ -37,7 +37,7 @@ console.log(indx)
 				return temp;
 			});
 		} else {
-			setslide((prev) => {
+			setSlide((prev) => {
 				let temp = prev;
 
 				temp[indx] = `animate-none w-[${width}]`;
@@ -79,7 +79,7 @@ console.log(indx)
 		// setActivePlay(index + 1, true, "100%");
 console.log(timeouts)
 		// index++;
-		// setactiveIndx(index);
+		// setActiveIndx(index);
 
 		// setTimeout(() => startPlay(), 5000);
 	};
@@ -92,14 +92,14 @@ console.log(timeouts)
 		// setActivePlay(index - 1, true, "100%");
 
 		// index--;
-		// setactiveIndx(index);
+		// setActiveIndx(index);
 
 		// setTimeout(() => startPlay(), 5000);
 	};
 
 	const pause = () => {
 		// intervals.forEach((val) => clearInterval(val));
-		// setpaused(true);
+		// setPaused(true);
 		// intervals = [];
 		// const play = document.getElementById(`play${index}`);
 		// play!.style.transitionP
@@ -111,7 +111,7 @@ console.log(timeouts)
 
 		if (index + 1 < 5) {
 			index++;
-			setactiveIndx(index);
+			setActiveIndx(index);
 
 			setActivePlay(index, true, "100%");
 
@@ -135,7 +135,7 @@ console.log(timeouts)
 		}
 		setActivePlay(index, true, "100%");
 
-		setslide(temp);
+		setSlide(temp);
 
 		timeouts.push(setTimeout(startPlay, 5000));
 

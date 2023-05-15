@@ -1,6 +1,6 @@
 function RightIntro() {
 	return (
-		<div className="h-full bg-secondary border-l-[1px] border-solid border-l-secondaryBorder border-b-[5px] border-b-primary flex items-center justify-center flex-col">
+		<div className="h-full bg-secondary border-b-[5px] border-b-primary flex items-center justify-center flex-col">
 			<p className="text-[30px] mb-[20px] text-[lightgray]">WazzApp Web</p>
 
 			<span className="text-[13px] text-[#979797] mb-[7px]">

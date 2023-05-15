@@ -6,8 +6,8 @@ import pic from "../images/profile.png";
 import { useEffect, useState } from "react";
 
 function LeftStatus() {
-	const [seen, setseen] = useState([] as Status[]);
-	const [notSeen, setnotSeen] = useState([] as Status[]);
+	const [seen, setSeen] = useState<Status[]>([]);
+	const [notSeen, setNotSeen] = useState<Status[]>([]);
 
 	useEffect(() => {
 		let temp: Status[] = [];
@@ -25,8 +25,8 @@ function LeftStatus() {
 			}
 		});
 
-		setseen(temp);
-		setnotSeen(temp1);
+		setSeen(temp);
+		setNotSeen(temp1);
 	}, []);
 
 	return (

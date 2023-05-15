@@ -1,7 +1,7 @@
 import Image from "next/image";
 import profile from "../images/profile.png";
 import { MoreVert, Search } from "@mui/icons-material";
-import { useCallback, useEffect, useState } from "react";
+import { createRef, useCallback, useEffect, useRef, useState } from "react";
 import IconBox from "./iconBox";
 import MenuBox from "./menuBox";
 import { useDispatch, useSelector } from "react-redux";
@@ -10,56 +10,62 @@ import { changeSect } from "@/redux/reducers/routeSlice";
 function ChatNavbar() {
 	const routes = useSelector((state) => (state as any).routes);
 	const dispatch = useDispatch();
-	const [open, setopen] = useState(false);
+	const [open, setOpen] = useState(false);
+	const menuRef = useRef<HTMLDivElement>(null);
+	const tileRefs: React.RefObject<HTMLDivElement>[] = Array(9)
+		.fill(null)
+		.map(() => createRef<HTMLDivElement>());
 
 	const openMenu = useCallback(
 		(e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-			if (!open) {
-				const menu = document.getElementById("menuIn");
-				const tile = document.querySelectorAll("#tileIn");
-
-				menu!.classList.replace("hidden", "flex");
+			if (!open && menuRef.current !== null) {
+				menuRef.current.classList.replace("hidden", "flex");
 
 				setTimeout(() => {
-					menu!.classList.replace("scale-0", "scale-100");
+					menuRef.current!.classList.replace("scale-0", "scale-100");
 
 					setTimeout(() => {
-						tile.forEach((val) => {
-							val.classList.replace("opacity-0", "opacity-100");
+						tileRefs.forEach((val) => {
+							if (val.current !== null) {
+								val.current.classList.replace("opacity-0", "opacity-100");
+							}
 						});
 
 						setTimeout(() => {
-							setopen(true);
+							setOpen(true);
 						}, 270);
 					}, 200);
 				}, 5);
 			}
 		},
-		[open]
+		[open, tileRefs]
 	);
 
 	const closeMenu = useCallback(
 		(e: MouseEvent) => {
 			const target = e.target as HTMLElement;
 
-			if (!["menuIn", "menuTileIn"].includes(target.id) && open) {
-				const menu = document.getElementById("menuIn");
-				const tile = document.querySelectorAll("#tileIn");
-
-				menu!.classList.replace("scale-100", "scale-0");
+			if (
+				!["menuIn", "menuTileIn"].includes(target.id) &&
+				open &&
+				menuRef.current !== null
+			) {
+				menuRef.current.classList.replace("scale-100", "scale-0");
 
 				setTimeout(() => {
-					menu!.classList.replace("flex", "hidden");
+					menuRef.current!.classList.replace("flex", "hidden");
 
-					tile.forEach((val) => {
-						val.classList.replace("opacity-100", "opacity-0");
+					tileRefs.forEach((val) => {
+						if (val.current !== null) {
+							val.current.classList.replace("opacity-100", "opacity-0");
+						}
 					});
 
-					setopen(false);
+					setOpen(false);
 				}, 200);
 			}
 		},
-		[open]
+		[open, tileRefs]
 	);
 
 	const openSideSect = (section: string, id: string) => {
@@ -161,6 +167,8 @@ function ChatNavbar() {
 						{ text: "Report" },
 						{ text: "Block" },
 					]}
+					menuRef={menuRef}
+					tileRefs={tileRefs}
 				/>
 			</div>
 		</nav>

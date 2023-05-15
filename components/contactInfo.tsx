@@ -16,41 +16,41 @@ import img2 from "../images/b3.jpg";
 import img3 from "../images/3bb1.jpg";
 import InfoTile from "./infoTile";
 import ReactDOM from "react-dom";
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 function ContactInfo() {
-	const [popup, setpopup] = useState(false);
-	const [muted, setmuted] = useState(false);
-	const [value, setvalue] = useState("8 Hours");
+	const [popup, setPopup] = useState(false);
+	const [muted, setMuted] = useState(false);
+	const [value, setValue] = useState("8 Hours");
+	const popupRef = useRef<HTMLDivElement>(null);
+	const mutePopupRef = useRef<HTMLDivElement>(null);
 
 	const openMutePopup = () => {
-		setpopup(true);
-
-		setTimeout(() => {
-			const popup = document.getElementById("popup");
-			const mutePopup = document.getElementById("mutePopup");
-
-			mutePopup!.classList.replace("opacity-0", "opacity-100");
+		if (popupRef.current !== null && mutePopupRef.current !== null) {
+			setPopup(true);
 
 			setTimeout(() => {
-				popup!.classList.replace("scale-0", "scale-100");
-			}, 100);
-		}, 5);
+				mutePopupRef.current!.classList.replace("opacity-0", "opacity-100");
+
+				setTimeout(() => {
+					popupRef.current!.classList.replace("scale-0", "scale-100");
+				}, 100);
+			}, 5);
+		}
 	};
 
 	const closeMutePopup = () => {
-		const popup = document.getElementById("popup");
-		const mutePopup = document.getElementById("mutePopup");
-
-		popup!.classList.replace("scale-100", "scale-0");
-
-		setTimeout(() => {
-			mutePopup!.classList.replace("opacity-100", "opacity-0");
+		if (popupRef.current !== null && mutePopupRef.current !== null) {
+			popupRef.current.classList.replace("scale-100", "scale-0");
 
 			setTimeout(() => {
-				setpopup(false);
-			}, 100);
-		}, 200);
+				mutePopupRef.current!.classList.replace("opacity-100", "opacity-0");
+
+				setTimeout(() => {
+					setPopup(false);
+				}, 100);
+			}, 200);
+		}
 	};
 
 	return (
@@ -114,11 +114,7 @@ function ContactInfo() {
 								<div className="relative h-full overflow-hidden">
 									<span className="absolute z-[2] h-full top-0 left-0 bg-[linear-gradient(to_bottom,transparent,transparent,#000000db)]"></span>
 
-									<Image
-										alt="image"
-										src={val}
-										className="object-cover"
-									/>
+									<Image alt="image" src={val} className="object-cover" />
 								</div>
 							</div>
 						))}
@@ -209,11 +205,13 @@ function ContactInfo() {
 				ReactDOM.createPortal(
 					<div
 						id="mutePopup"
+						ref={mutePopupRef}
 						onClick={closeMutePopup}
 						className="fixed z-30 bg-[#1a1a1aba] opacity-0 h-full top-0 left-0 flex items-center justify-center transition-all duration-100"
 					>
 						<div
 							id="popup"
+							ref={popupRef}
 							className="bg-secondary rounded-[4px] pt-[25px] pb-[20px] px-[20px] flex flex-col w-[450px] h-[320px] justify-between scale-0 transition-all duration-200"
 						>
 							<div className="flex flex-col gap-[20px]">
@@ -230,7 +228,7 @@ function ContactInfo() {
 									{["8 Hours", "1 Week", "Always"].map((val, ind) => (
 										<div key={ind} className="flex gap-[10px] items-center">
 											<div
-												onClick={() => setvalue(val)}
+												onClick={() => setValue(val)}
 												role="radio button"
 												aria-checked={val === value}
 												className={`border-solid border-2 ${
@@ -261,7 +259,7 @@ function ContactInfo() {
 								<button
 									onClick={() => {
 										closeMutePopup();
-										setmuted((prev) => !prev);
+										setMuted((prev) => !prev);
 									}}
 									className="font-medium text-secondary text-[12px] bg-primary w-[80px] h-[35px] rounded-[35px] hover:shadow-[0px_0px_10px_#ffffff1a_inset,0px_5px_5px_#00000026] cursor-pointer transition-all duration-100"
 								>

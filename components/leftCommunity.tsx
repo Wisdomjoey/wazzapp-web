@@ -1,24 +1,27 @@
 import { useDispatch } from "react-redux";
 import NewChatNav from "./newChatNav";
 import { removeSubRoute } from "@/redux/reducers/routeSlice";
+import { useRef } from "react";
 
 function LeftCommunity() {
 	const dispatch = useDispatch();
+	const commRef = useRef<HTMLDivElement>(null);
 
 	const closeCommunity = () => {
-		const community = document.getElementById("community");
+		if (commRef.current !== null) {
+			commRef.current.classList.replace("translate-x-0", "-translate-x-[100%]");
 
-		community!.classList.replace("w-full", "w-0");
-
-		setTimeout(() => {
-			dispatch(removeSubRoute("communities"));
-		}, 200);
+			setTimeout(() => {
+				dispatch(removeSubRoute("communities"));
+			}, 200);
+		}
 	};
 
 	return (
 		<div
 			id="community"
-			className="overflow-hidden h-full transition-all duration-200 absolute top-0 left-0 z-[1]"
+			ref={commRef}
+			className="overflow-hidden w-full h-full transition-all -translate-x-[100%] duration-200 absolute top-0 left-0 z-[1]"
 		>
 			<NewChatNav text="Communities" clicked={closeCommunity} />
 

@@ -11,8 +11,8 @@ type Props = {
 };
 
 function StatusBox({ name, time, img, status, id }: Props) {
-	const [array, setarray] = useState("");
-	const [array1, setarray1] = useState("");
+	const [array, setArray] = useState("");
+	const [array1, setArray1] = useState("");
 
 	useEffect(() => {
 		const length: number =
@@ -48,8 +48,8 @@ function StatusBox({ name, time, img, status, id }: Props) {
 			}
 		}
 
-		setarray(dashArray);
-		setarray1(dashArray1);
+		setArray(dashArray);
+		setArray1(dashArray1);
 	}, [id, status, status.length]);
 
 	return (

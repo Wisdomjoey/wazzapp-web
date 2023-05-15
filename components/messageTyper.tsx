@@ -1,5 +1,3 @@
-"use client";
-
 import {
 	AttachFileOutlined,
 	AutoAwesome,
@@ -12,70 +10,55 @@ import {
 	SentimentSatisfiedOutlined,
 } from "@mui/icons-material";
 import IconBox from "./iconBox";
-import { useEffect } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 function MessageTyper() {
-	let open: boolean = false;
+	const [open, setOpen] = useState(false);
+	const shortRef = useRef<HTMLDivElement>(null);
+	const iconRefs = useRef<HTMLDivElement[]>([]);
 
-	const openShortLinks = () => {
-		const shortL = document.getElementById("shortL");
-		const iconL = document.querySelectorAll("#iconL");
-
-		if (open) {
-			iconL.forEach((val) => {
-				val.classList.replace("opacity-100", "opacity-0");
-				val.classList.replace("bottom-[8px]", "-bottom-[8px]");
-			});
+	const openShortLinks = useCallback(() => {
+		if (!open && shortRef.current !== null) {
+			shortRef.current.classList.replace("hidden", "flex");
 
 			setTimeout(() => {
-				shortL!.classList.replace("flex", "hidden");
-			}, 420);
-
-			open = false;
-		} else {
-			shortL!.classList.replace("hidden", "flex");
-
-			setTimeout(() => {
-				iconL.forEach((val) => {
+				iconRefs.current.forEach((val) => {
 					val.classList.replace("opacity-0", "opacity-100");
 					val.classList.replace("-bottom-[8px]", "bottom-[8px]");
 				});
+
+				setTimeout(() => {
+					setOpen(true);
+				}, 420);
 			}, 5);
-
-			open = true;
 		}
-	};
+	}, [open]);
 
-	const closeShortLinks = (e: MouseEvent) => {
-		const shortL = document.getElementById("shortL");
-		const iconL = document.querySelectorAll("#iconL");
-		const target = e.target as HTMLElement;
+	const closeShortLinks = useCallback(
+		(e: MouseEvent) => {
+			const target = e.target as HTMLElement;
 
-		if (
-			!["iconC", "shortL", "icon"].includes(target.id) &&
-			target.tagName !== "svg" &&
-			target.tagName !== "path" &&
-			open
-		) {
-			iconL.forEach((val) => {
-				val.classList.replace("opacity-100", "opacity-0");
-				val.classList.replace("bottom-[8px]", "-bottom-[8px]");
-			});
+			if (!["iconC"].includes(target.id) && open && shortRef.current !== null) {
+				iconRefs.current.forEach((val) => {
+					val.classList.replace("opacity-100", "opacity-0");
+					val.classList.replace("bottom-[8px]", "-bottom-[8px]");
+				});
 
-			setTimeout(() => {
-				shortL!.classList.replace("flex", "hidden");
-			}, 420);
+				setTimeout(() => {
+					shortRef.current!.classList.replace("flex", "hidden");
 
-			open = false;
-		}
-	};
+					setOpen(false);
+				}, 420);
+			}
+		},
+		[open]
+	);
 
 	useEffect(() => {
 		window.addEventListener("click", closeShortLinks);
 
 		return () => window.removeEventListener("click", closeShortLinks);
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, []);
+	}, [closeShortLinks]);
 
 	return (
 		<div className="w-full h-[60px] bg-secondary flex items-center justify-between px-[20px] py-[10px] gap-[10px]">
@@ -100,7 +83,11 @@ function MessageTyper() {
 					/>
 				</IconBox>
 
-				<div id="shortL" className="absolute hidden flex-col bottom-[53px]">
+				<div
+					id="shortL"
+					ref={shortRef}
+					className="absolute hidden flex-col bottom-[53px]"
+				>
 					{[
 						[
 							BarChart,
@@ -141,6 +128,7 @@ function MessageTyper() {
 							<div className="w-[61px] h-[61px] relative" key={ind} id="iconC">
 								<div
 									id="iconL"
+									ref={(ref) => (iconRefs.current[ind] = ref!)}
 									style={{ transitionDelay: delay }}
 									className={`w-[47px] h-[47px] rounded-[50%] ${val[1]} flex items-center justify-center cursor-pointer absolute left-[8px] -bottom-[8px] opacity-0 transition-all duration-300 ease-in-out`}
 								>

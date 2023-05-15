@@ -20,7 +20,7 @@ export default function App() {
 			<div className="h-full flex justify-start bg-darker relative">
 				{["home", "status"].includes(routes.route) && (
 					<>
-						<section id="leftSection" className="basis-[30%]">
+						<section id="leftSection" className="basis-[30%] relative">
 							{routes.subRoutes.includes("communities") && <LeftCommunity />}
 
 							{routes.route === "home" && <LeftChats />}

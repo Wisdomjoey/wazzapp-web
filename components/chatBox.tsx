@@ -1,6 +1,12 @@
 import { Add, DoneAllRounded, EmojiEmotions } from "@mui/icons-material";
-import { MouseEvent, useCallback, useEffect, useState } from "react";
-import MenuTile from "./menuTile";
+import {
+	MouseEvent,
+	createRef,
+	useCallback,
+	useEffect,
+	useRef,
+	useState,
+} from "react";
 import MenuBox from "./menuBox";
 
 type Props = {
@@ -8,151 +14,157 @@ type Props = {
 };
 
 function ChatBox({ id }: Props) {
-	const [open, setopen] = useState(false);
-	const [openB, setopenB] = useState(false);
+	const [open, setOpen] = useState(false);
+	const [openB, setOpenB] = useState(false);
+	const emojiRef = useRef<HTMLDivElement>(null);
+	const reactionRef = useRef<HTMLDivElement>(null);
+	const arrowRef = useRef<HTMLDivElement>(null);
+	const menuRef = useRef<HTMLDivElement>(null);
+	const tileRefs: React.RefObject<HTMLDivElement>[] = Array(6)
+		.fill(null)
+		.map(() => createRef<HTMLDivElement>());
 
 	const showIcon = () => {
-		const iconR = document.getElementById(`iconR${id}`);
-
-		iconR!.classList.replace("hidden", "flex");
+		if (emojiRef.current !== null) {
+			emojiRef.current.classList.replace("hidden", "flex");
+		}
 	};
 
 	const hideIcon = () => {
-		const iconR = document.getElementById(`iconR${id}`);
-
-		iconR!.classList.replace("flex", "hidden");
+		if (emojiRef.current !== null) {
+			emojiRef.current.classList.replace("flex", "hidden");
+		}
 	};
 
 	const openReaction = useCallback(() => {
-		if (!open) {
-			const reaction = document.getElementById(`reaction${id}`);
-			const iconR = document.getElementById(`iconR${id}`);
-
-			reaction!.classList.replace("hidden", "flex");
-			iconR!.style.display = "flex";
+		if (!open && emojiRef.current !== null && reactionRef.current !== null) {
+			reactionRef.current.classList.replace("hidden", "flex");
+			emojiRef.current.style.display = "flex";
 
 			setTimeout(() => {
-				reaction!.classList.replace("w-0", "w-[284px]");
+				reactionRef.current!.classList.replace("w-0", "w-[284px]");
 
-				setopen(true);
+				setOpen(true);
 			}, 5);
 		}
-	}, [id, open]);
+	}, [open]);
 
 	const closeReaction = useCallback(
 		(e: globalThis.MouseEvent) => {
 			const target = e.target as HTMLElement;
 
-			if (![`reaction${id}`, `react${id}`].includes(target.id) && open) {
-				const reaction = document.getElementById(`reaction${id}`);
-				const iconR = document.getElementById(`iconR${id}`);
-
-				reaction!.classList.replace("w-[284px]", "w-0");
+			if (
+				![`reaction${id}`, `react${id}`].includes(target.id) &&
+				open &&
+				emojiRef.current !== null &&
+				reactionRef.current !== null
+			) {
+				reactionRef.current.classList.replace("w-[284px]", "w-0");
 
 				setTimeout(() => {
-					reaction!.classList.replace("hidden", "flex");
-					iconR!.style.removeProperty("display");
+					reactionRef.current!.classList.replace("hidden", "flex");
+					emojiRef.current!.style.removeProperty("display");
 				}, 200);
 
-				setopen(false);
+				setOpen(false);
 			}
 		},
 		[id, open]
 	);
 
 	const showArrow = () => {
-		const arrow = document.getElementById(`arrow${id}`);
+		if (arrowRef.current !== null) {
+			arrowRef.current.classList.replace("hidden", "flex");
 
-		arrow!.classList.replace("hidden", "flex");
-
-		setTimeout(() => {
-			arrow!.classList.replace("w-0", "w-[30px]");
-			arrow!.classList.replace("h-0", "h-[30px]");
-			arrow!.classList.replace("opacity-0", "opacity-100");
-		}, 5);
+			setTimeout(() => {
+				arrowRef.current!.classList.replace("w-0", "w-[30px]");
+				arrowRef.current!.classList.replace("h-0", "h-[30px]");
+				arrowRef.current!.classList.replace("opacity-0", "opacity-100");
+			}, 5);
+		}
 	};
 
 	const hideArrow = () => {
-		const arrow = document.getElementById(`arrow${id}`);
+		if (arrowRef.current !== null) {
+			arrowRef.current.classList.replace("w-[30px]", "w-0");
+			arrowRef.current.classList.replace("h-[30px]", "h-0");
+			arrowRef.current.classList.replace("opacity-100", "opacity-0");
 
-		arrow!.classList.replace("w-[30px]", "w-0");
-		arrow!.classList.replace("h-[30px]", "h-0");
-		arrow!.classList.replace("opacity-100", "opacity-0");
-
-		setTimeout(() => {
-			arrow!.classList.replace("flex", "hidden");
-		}, 200);
+			setTimeout(() => {
+				arrowRef.current!.classList.replace("flex", "hidden");
+			}, 200);
+		}
 	};
 
 	const openMenu = useCallback(
 		(e: MouseEvent<HTMLDivElement, globalThis.MouseEvent>) => {
-			if (!openB) {
-				const menu = document.getElementById(`menuB${id}`);
-				const tile = document.querySelectorAll(`#tileB${id}`);
-				const arrow = document.getElementById(`arrow${id}`);
-
-				menu!.classList.replace("hidden", "flex");
-				arrow!.style.display = "flex";
-				menu!.style.right = `${window.innerWidth - e.clientX}px`;
-				menu!.style.left = "revert";
+			if (!openB && arrowRef.current !== null && menuRef.current !== null) {
+				menuRef.current.classList.replace("hidden", "flex");
+				arrowRef.current.style.display = "flex";
+				menuRef.current.style.right = `${window.innerWidth - e.clientX}px`;
+				menuRef.current.style.left = "revert";
 
 				if (window.innerHeight - e.clientY < 260) {
-					menu!.style.bottom = `${window.innerHeight - e.clientY + 5}px`;
-					menu!.style.top = "revert";
-					menu!.classList.add("origin-bottom-right");
+					menuRef.current.style.bottom = `${
+						window.innerHeight - e.clientY + 5
+					}px`;
+					menuRef.current.style.top = "revert";
+					menuRef.current.classList.add("origin-bottom-right");
 				} else {
-					menu!.style.top = `${e.clientY + 5}px`;
-					menu!.style.bottom = "revert";
-					menu!.classList.add("origin-top-right");
+					menuRef.current.style.top = `${e.clientY + 5}px`;
+					menuRef.current.style.bottom = "revert";
+					menuRef.current.classList.add("origin-top-right");
 				}
 
 				setTimeout(() => {
-					menu!.classList.replace("scale-0", "scale-100");
+					menuRef.current!.classList.replace("scale-0", "scale-100");
 
 					setTimeout(() => {
-						tile.forEach((val) => {
-							val.classList.replace("opacity-0", "opacity-100");
+						tileRefs.forEach((val) => {
+							if (val.current !== null) {
+								val.current.classList.replace("opacity-0", "opacity-100");
+							}
 						});
 
 						setTimeout(() => {
-							setopenB(true);
+							setOpenB(true);
 						}, 180);
 					}, 200);
 				}, 5);
 			}
 		},
-		[id, openB]
+		[openB, tileRefs]
 	);
 
 	const closeMenu = useCallback(
 		(e: globalThis.MouseEvent) => {
 			const target = e.target as HTMLElement;
-console.log(open)
+
 			if (
 				![`menuB${id}`, `menuTileB${id}`, `arrow${id}`].includes(target.id) &&
-				openB
+				openB &&
+				arrowRef.current !== null &&
+				menuRef.current !== null
 			) {
-				const menu = document.getElementById(`menuB${id}`);
-				const tile = document.querySelectorAll(`#tileB${id}`);
-				const arrow = document.getElementById(`arrow${id}`);
-
-				menu!.classList.replace("scale-100", "scale-0");
+				menuRef.current.classList.replace("scale-100", "scale-0");
 
 				setTimeout(() => {
-					tile.forEach((val) => {
-						val.classList.replace("opacity-100", "opacity-0");
+					tileRefs.forEach((val) => {
+						if (val.current !== null) {
+							val.current.classList.replace("opacity-100", "opacity-0");
+						}
 					});
 
-					arrow!.style.removeProperty("display");
-					menu!.classList.replace("flex", "hidden");
-					menu!.classList.remove("origin-top-right");
-					menu!.classList.remove("origin-bottom-right");
+					arrowRef.current!.style.removeProperty("display");
+					menuRef.current!.classList.replace("flex", "hidden");
+					menuRef.current!.classList.remove("origin-top-right");
+					menuRef.current!.classList.remove("origin-bottom-right");
 
-					setopenB(false);
+					setOpenB(false);
 				}, 200);
 			}
 		},
-		[id, openB]
+		[id, openB, tileRefs]
 	);
 
 	useEffect(() => {
@@ -178,6 +190,7 @@ console.log(open)
 			<div className="flex flex-col relative z-10">
 				<div
 					id={`reaction${id}`}
+					ref={reactionRef}
 					className="absolute w-0 -right-[132px] bottom-[30px] overflow-hidden hidden transition-all duration-100"
 				>
 					<div
@@ -200,6 +213,7 @@ console.log(open)
 
 				<div
 					id={`iconR${id}`}
+					ref={emojiRef}
 					onClick={openReaction}
 					className="w-[21px] h-[21px] rounded-[50%] bg-[#000000b6] hidden items-center justify-center cursor-pointer"
 				>
@@ -214,6 +228,7 @@ console.log(open)
 			>
 				<div
 					id={`arrow${id}`}
+					ref={arrowRef}
 					onClick={openMenu}
 					className="absolute opacity-0 z-[2] right-0 top-0 w-0 h-0 items-center justify-center cursor-pointer transition-all duration-200 hidden overflow-hidden"
 				>
@@ -238,7 +253,7 @@ console.log(open)
 					<div className="p-[10px] flex flex-col gap-[10px] justify-start rounded-[5px] bg-[#00000033] border-l-[4px] border-solid border-primary">
 						<p className="text-[12px] text-[cyan] font-medium">Jay Z</p>
 
-						<p className="text-[12px] text-[white] opacity-[.8]">Yeah</p>
+						<p className="text-[12px] text-[white] opacity-[.8]">{`${openB}`}</p>
 					</div>
 				</div>
 
@@ -269,6 +284,8 @@ console.log(open)
 				width="w-[180px]"
 				height="h-[260px]"
 				id={`B${id}`}
+				menuRef={menuRef}
+				tileRefs={tileRefs}
 				links={[
 					{ text: "Message info" },
 					{ text: "Reply" },
