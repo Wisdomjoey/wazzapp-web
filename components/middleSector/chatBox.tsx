@@ -7,47 +7,67 @@ import {
 	useRef,
 	useState,
 } from "react";
-import MenuBox from "./menuBox";
+import MenuBox from "../menuBox";
+import Image from "next/image";
+import pic from "../../images/profile.png";
+import b3 from "../../images/b3.jpg";
 
 type Props = {
 	id: number;
+	sent: boolean;
 };
 
-function ChatBox({ id }: Props) {
-	const [open, setOpen] = useState(false);
-	const [openB, setOpenB] = useState(false);
+function ChatBox({ id, sent }: Props) {
+	const openRef = useRef(false);
+	const openBRef = useRef(false);
 	const emojiRef = useRef<HTMLDivElement>(null);
 	const reactionRef = useRef<HTMLDivElement>(null);
 	const arrowRef = useRef<HTMLDivElement>(null);
 	const menuRef = useRef<HTMLDivElement>(null);
+	const iconRef = useRef<HTMLDivElement>(null);
+	const iconRefs = useRef([] as HTMLParagraphElement[]);
 	const tileRefs: React.RefObject<HTMLDivElement>[] = Array(6)
 		.fill(null)
 		.map(() => createRef<HTMLDivElement>());
 
 	const showIcon = () => {
-		if (emojiRef.current !== null) {
+		if (emojiRef.current !== null && !openRef.current) {
 			emojiRef.current.classList.replace("hidden", "flex");
 		}
 	};
 
 	const hideIcon = () => {
-		if (emojiRef.current !== null) {
+		if (emojiRef.current !== null && !openRef.current) {
 			emojiRef.current.classList.replace("flex", "hidden");
 		}
 	};
 
 	const openReaction = useCallback(() => {
-		if (!open && emojiRef.current !== null && reactionRef.current !== null) {
+		if (
+			!openRef.current &&
+			emojiRef.current !== null &&
+			reactionRef.current !== null &&
+			iconRef.current !== null
+		) {
 			reactionRef.current.classList.replace("hidden", "flex");
 			emojiRef.current.style.display = "flex";
 
 			setTimeout(() => {
 				reactionRef.current!.classList.replace("w-0", "w-[284px]");
 
-				setOpen(true);
+				setTimeout(() => {
+					iconRefs.current.forEach((val) =>
+						val.classList.replace("opacity-0", "opacity-100")
+					);
+					iconRef.current!.classList.replace("opacity-0", "opacity-100");
+
+					setTimeout(() => {
+						openRef.current = true;
+					}, 180);
+				}, 200);
 			}, 5);
 		}
-	}, [open]);
+	}, []);
 
 	const closeReaction = useCallback(
 		(e: globalThis.MouseEvent) => {
@@ -55,21 +75,28 @@ function ChatBox({ id }: Props) {
 
 			if (
 				![`reaction${id}`, `react${id}`].includes(target.id) &&
-				open &&
+				openRef.current &&
 				emojiRef.current !== null &&
-				reactionRef.current !== null
+				reactionRef.current !== null &&
+				iconRef.current !== null
 			) {
 				reactionRef.current.classList.replace("w-[284px]", "w-0");
 
 				setTimeout(() => {
-					reactionRef.current!.classList.replace("hidden", "flex");
+					reactionRef.current!.classList.replace("flex", "hidden");
 					emojiRef.current!.style.removeProperty("display");
-				}, 200);
+					iconRefs.current.forEach((val) =>
+						val.classList.replace("opacity-100", "opacity-0")
+					);
+					iconRef.current!.classList.replace("opacity-100", "opacity-0");
 
-				setOpen(false);
+					setTimeout(() => {
+						openRef.current = false;
+					}, 180);
+				}, 200);
 			}
 		},
-		[id, open]
+		[id]
 	);
 
 	const showArrow = () => {
@@ -98,7 +125,7 @@ function ChatBox({ id }: Props) {
 
 	const openMenu = useCallback(
 		(e: MouseEvent<HTMLDivElement, globalThis.MouseEvent>) => {
-			if (!openB && arrowRef.current !== null && menuRef.current !== null) {
+			if (!openBRef.current && arrowRef.current !== null && menuRef.current !== null) {
 				menuRef.current.classList.replace("hidden", "flex");
 				arrowRef.current.style.display = "flex";
 				menuRef.current.style.right = `${window.innerWidth - e.clientX}px`;
@@ -127,13 +154,13 @@ function ChatBox({ id }: Props) {
 						});
 
 						setTimeout(() => {
-							setOpenB(true);
+							openBRef.current = true;
 						}, 180);
 					}, 200);
 				}, 5);
 			}
 		},
-		[openB, tileRefs]
+		[tileRefs]
 	);
 
 	const closeMenu = useCallback(
@@ -142,7 +169,7 @@ function ChatBox({ id }: Props) {
 
 			if (
 				![`menuB${id}`, `menuTileB${id}`, `arrow${id}`].includes(target.id) &&
-				openB &&
+				openBRef.current &&
 				arrowRef.current !== null &&
 				menuRef.current !== null
 			) {
@@ -160,11 +187,11 @@ function ChatBox({ id }: Props) {
 					menuRef.current!.classList.remove("origin-top-right");
 					menuRef.current!.classList.remove("origin-bottom-right");
 
-					setOpenB(false);
+					openBRef.current = false;
 				}, 200);
 			}
 		},
-		[id, openB, tileRefs]
+		[id, tileRefs]
 	);
 
 	useEffect(() => {
@@ -185,27 +212,41 @@ function ChatBox({ id }: Props) {
 		<div
 			onMouseOver={showIcon}
 			onMouseLeave={hideIcon}
-			className="flex items-center justify-end px-[50px] gap-[5px]"
+			className={`flex items-center ${
+				sent ? "justify-start flex-row" : "justify-end flex-row-reverse"
+			} px-[50px] gap-[5px]`}
 		>
 			<div className="flex flex-col relative z-10">
 				<div
 					id={`reaction${id}`}
 					ref={reactionRef}
-					className="absolute w-0 -right-[132px] bottom-[30px] overflow-hidden hidden transition-all duration-100"
+					className="absolute w-0 -right-[132px] bottom-[30px] overflow-hidden hidden transition-all duration-200"
 				>
 					<div
 						id={`react${id}`}
-						className="flex items-center justify-between bg-secondary px-[8px] py-[10px] rounded-[30px] w-[284px]"
+						className="flex items-center justify-between bg-secondary px-[8px] py-[10px] rounded-[30px] w-[284px] border border-[#ffffff0a]"
 					>
 						<div className="flex items-center gap-[3px]">
-							{["👍", "❤️", "😂", "😯", "😢", "🙏"].map((val, ind) => (
-								<p key={ind} className="text-[26px] cursor-pointer">
-									{val}
-								</p>
-							))}
+							{["👍", "❤️", "😂", "😯", "😢", "🙏"].map((val, ind) => {
+								const delay = `${ind * 30}ms`;
+
+								return (
+									<p
+										key={ind}
+										ref={(value) => (iconRefs.current[ind] = value!)}
+										style={{ transitionDelay: delay }}
+										className="text-[26px] cursor-pointer opacity-0 duration-100"
+									>
+										{val}
+									</p>
+								);
+							})}
 						</div>
 
-						<div className="w-[29px] h-[29px] rounded-[50%] bg-[#ffffff69] flex items-center justify-center cursor-pointer">
+						<div
+							ref={iconRef}
+							className="w-[29px] h-[29px] rounded-[50%] bg-[#ffffff69] flex items-center justify-center cursor-pointer opacity-0 duration-100 delay-[180ms]"
+						>
 							<Add className="text-secondary" sx={{ fontSize: "25px" }} />
 						</div>
 					</div>
@@ -224,13 +265,15 @@ function ChatBox({ id }: Props) {
 			<div
 				onMouseOver={showArrow}
 				onMouseLeave={hideArrow}
-				className="rounded-[5px] bg-primaryDark flex flex-col relative"
+				className={`rounded-[5px] ${
+					sent ? "bg-primaryDark" : "bg-secondary"
+				} flex flex-col text-[white] text-[14px] relative`}
 			>
 				<div
 					id={`arrow${id}`}
 					ref={arrowRef}
 					onClick={openMenu}
-					className="absolute opacity-0 z-[2] right-0 top-0 w-0 h-0 items-center justify-center cursor-pointer transition-all duration-200 hidden overflow-hidden"
+					className="absolute bg-[linear-gradient(225deg,_var(--tw-gradient-from),_var(--tw-gradient-stops))] from-secondary via-secondary rounded-[50%] opacity-0 z-[2] right-0 top-0 w-0 h-0 items-center justify-center cursor-pointer transition-all duration-200 hidden overflow-hidden"
 				>
 					<svg
 						viewBox="0 0 19 20"
@@ -249,36 +292,67 @@ function ChatBox({ id }: Props) {
 					</svg>
 				</div>
 
-				<div className="px-[3px] pt-[3px] cursor-pointer">
-					<div className="p-[10px] flex flex-col gap-[10px] justify-start rounded-[5px] bg-[#00000033] border-l-[4px] border-solid border-primary">
-						<p className="text-[12px] text-[cyan] font-medium">Jay Z</p>
-
-						<p className="text-[12px] text-[white] opacity-[.8]">{`${openB}`}</p>
-					</div>
+				<div
+					className={`w-[16px] h-[16px] absolute top-0 ${
+						sent ? "right-[-8px]" : "left-[-8px]"
+					} rounded-[4px] overflow-hidden`}
+				>
+					<svg
+						viewBox="0 0 100 100"
+						className={`${sent ? "fill-primaryDark" : "fill-secondary"}`}
+					>
+						<path d="M0 0 L100 0 L50 100 L0 0 Z"></path>
+					</svg>
 				</div>
 
-				<div className="flex items-center gap-[10px] py-[4px]">
-					<p className="ml-[10px] text-[14px] my-[5px] text-[white] font-normal">
-						okay
+				<div className={`${sent ? "p-[10px]" : "px-[10px] pt-[10px]"}`}>
+					<p>
+						<span className="text-primary font-medium">Hashira Hoshi</span>
+
+						<span className="text-[11px] text-[lightgray] ml-[5px] font-light opacity-[.8]">
+							+234 802 949 4195
+						</span>
 					</p>
+				</div>
+
+				{/* <div className="px-[4px] relative">
+					<div className="rounded-[7px] bg-[#00000033] overflow-hidden cursor-pointer flex">
+						<div className="p-[10px] flex-1 flex flex-col gap-[10px] justify-start border-l-[4px] border-solid border-primary">
+							<p className="text-[cyan] font-medium">Jay Z</p>
+
+							<p className="text-[15px] opacity-[.8]">{`${openB}`}</p>
+						</div>
+
+						<div className="w-[60px]">
+							<Image alt={"photo"} src={b3} className="h-full object-cover" />
+						</div>
+					</div>
+				</div> */}
+
+				<div className="flex items-center justify-between gap-[10px] py-[5px] px-[10px]">
+					<p className="text-[15px] my-[5px]">{`${openRef.current}`}</p>
 
 					<div className="flex items-end gap-[5px] self-end">
-						<span className="text-[10px] text-[white] opacity-[.8]">
-							8:55 PM
-						</span>
+						<span className="text-[11px] opacity-[.8]">8:55 PM</span>
 
-						<DoneAllRounded
-							sx={{ fontSize: "14px", color: "cyan", marginRight: "5px" }}
-						/>
-					</div>
-
-					<div className="w-[10px] h-[10px] absolute top-0 right-[-5px] rounded-[2px] overflow-hidden">
-						<svg viewBox="0 0 100 100">
-							<path fill="#009d79" d="M0 0 L100 0 L50 100 L0 0 Z"></path>
-						</svg>
+						{sent && (
+							<DoneAllRounded sx={{ fontSize: "16px", color: "cyan" }} />
+						)}
 					</div>
 				</div>
 			</div>
+
+			{!sent && (
+				<div className="mr-[5px] self-start">
+					<Image
+						alt={"Profile pic"}
+						src={pic}
+						width={28}
+						height={28}
+						className="rounded-[50%]"
+					/>
+				</div>
+			)}
 
 			<MenuBox
 				width="w-[180px]"

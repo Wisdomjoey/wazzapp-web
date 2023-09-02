@@ -1,3 +1,4 @@
+import Script from "next/script";
 import "../styles/globals.css";
 
 export const metadata = {
@@ -14,6 +15,8 @@ export default function RootLayout({
 		<html lang="en">
 			<body>
 				{children}
+
+				<Script src="../js/microphonePlugin.js" />
 			</body>
 		</html>
 	);

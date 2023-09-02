@@ -11,43 +11,44 @@ import {
 } from "@mui/icons-material";
 import SectNavbar from "./sectNavbar";
 import Image from "next/image";
-import img1 from "../images/b4.jpg";
-import img2 from "../images/b3.jpg";
-import img3 from "../images/3bb1.jpg";
-import InfoTile from "./infoTile";
-import ReactDOM from "react-dom";
+import img1 from "../../images/b4.jpg";
+import img2 from "../../images/b3.jpg";
+import img3 from "../../images/3bb1.jpg";
+import InfoTile from "../infoTile";
 import { useRef, useState } from "react";
+import MutePopup from "../popups/mutePopup";
+import ReportPopup from "../popups/reportPopup";
+import BlockPopup from "../popups/blockPopup";
 
 function ContactInfo() {
-	const [popup, setPopup] = useState(false);
+	const [popup, setPopup] = useState<string>("");
 	const [muted, setMuted] = useState(false);
-	const [value, setValue] = useState("8 Hours");
 	const popupRef = useRef<HTMLDivElement>(null);
-	const mutePopupRef = useRef<HTMLDivElement>(null);
+	const popupRefCon = useRef<HTMLDivElement>(null);
 
-	const openMutePopup = () => {
-		if (popupRef.current !== null && mutePopupRef.current !== null) {
-			setPopup(true);
+	const openPopup = (popupName: string) => {
+		setPopup(popupName);
 
-			setTimeout(() => {
-				mutePopupRef.current!.classList.replace("opacity-0", "opacity-100");
+		setTimeout(() => {
+			if (popupRef.current !== null && popupRefCon.current !== null) {
+				popupRefCon.current.classList.replace("opacity-0", "opacity-100");
 
 				setTimeout(() => {
 					popupRef.current!.classList.replace("scale-0", "scale-100");
 				}, 100);
-			}, 5);
-		}
+			}
+		}, 5);
 	};
 
-	const closeMutePopup = () => {
-		if (popupRef.current !== null && mutePopupRef.current !== null) {
+	const closePopup = () => {
+		if (popupRef.current !== null && popupRefCon.current !== null) {
 			popupRef.current.classList.replace("scale-100", "scale-0");
 
 			setTimeout(() => {
-				mutePopupRef.current!.classList.replace("opacity-100", "opacity-0");
+				popupRefCon.current!.classList.replace("opacity-100", "opacity-0");
 
 				setTimeout(() => {
-					setPopup(false);
+					setPopup("");
 				}, 100);
 			}, 200);
 		}
@@ -135,7 +136,7 @@ function ContactInfo() {
 					<InfoTile
 						title={"Mute notifications"}
 						Icon={Notifications}
-						clicked={openMutePopup}
+						clicked={() => openPopup("mute")}
 						trailing={
 							<div className="relative flex items-center">
 								<span
@@ -179,6 +180,7 @@ function ContactInfo() {
 						iconColor="#ff7070"
 						iconSize="20px"
 						hover="hover:bg-[#ffffff1a]"
+						clicked={() => openPopup("block")}
 					/>
 
 					<InfoTile
@@ -188,6 +190,7 @@ function ContactInfo() {
 						iconColor="#ff7070"
 						iconSize="20px"
 						hover="hover:bg-[#ffffff1a]"
+						clicked={() => openPopup("report")}
 					/>
 
 					<InfoTile
@@ -201,75 +204,30 @@ function ContactInfo() {
 				</div>
 			</div>
 
-			{popup &&
-				ReactDOM.createPortal(
-					<div
-						id="mutePopup"
-						ref={mutePopupRef}
-						onClick={closeMutePopup}
-						className="fixed z-30 bg-[#1a1a1aba] opacity-0 h-full top-0 left-0 flex items-center justify-center transition-all duration-100"
-					>
-						<div
-							id="popup"
-							ref={popupRef}
-							className="bg-secondary rounded-[4px] pt-[25px] pb-[20px] px-[20px] flex flex-col w-[450px] h-[320px] justify-between scale-0 transition-all duration-200"
-						>
-							<div className="flex flex-col gap-[20px]">
-								<p className="text-[lightgray] text-[18px] font-medium">
-									Mute notifications
-								</p>
+			{popup === "mute" && (
+				<MutePopup
+					setMuted={setMuted}
+					muted={muted}
+					closePopup={closePopup}
+					popupRefCon={popupRefCon}
+					popupRef={popupRef}
+				/>
+			)}
 
-								<span className="text-[13px] text-[#8f8f8f] leading-[1.5]">
-									No one else in this chat will see that you muted it, and you
-									will still be notified if you are mentioned.
-								</span>
-
-								<div className="flex flex-col gap-[15px]">
-									{["8 Hours", "1 Week", "Always"].map((val, ind) => (
-										<div key={ind} className="flex gap-[10px] items-center">
-											<div
-												onClick={() => setValue(val)}
-												role="radio button"
-												aria-checked={val === value}
-												className={`border-solid border-2 ${
-													val === value ? "border-primary" : "border-[#8f8f8f]"
-												} w-[18px] h-[18px] rounded-[50%] flex items-center justify-center p-[3px]`}
-											>
-												{val === value && (
-													<span className="h-full rounded-[50%] bg-primary"></span>
-												)}
-											</div>
-
-											<p className="text-[lightgray] text-[13px] font-medium">
-												{val}
-											</p>
-										</div>
-									))}
-								</div>
-							</div>
-
-							<div className="flex items-center justify-end gap-[15px]">
-								<button
-									onClick={closeMutePopup}
-									className="font-medium text-primary text-[12px] bg-[transparent] w-[80px] h-[35px] rounded-[35px] border-solid border-[1px] border-[#4e536c] hover:shadow-[0px_0px_10px_#ffffff1a_inset,0px_5px_5px_#00000026] cursor-pointer transition-all duration-100"
-								>
-									Cancel
-								</button>
-
-								<button
-									onClick={() => {
-										closeMutePopup();
-										setMuted((prev) => !prev);
-									}}
-									className="font-medium text-secondary text-[12px] bg-primary w-[80px] h-[35px] rounded-[35px] hover:shadow-[0px_0px_10px_#ffffff1a_inset,0px_5px_5px_#00000026] cursor-pointer transition-all duration-100"
-								>
-									{muted ? "Unmute" : "Mute"}
-								</button>
-							</div>
-						</div>
-					</div>,
-					document.querySelector("#main")!
-				)}
+			{popup === "block" && (
+				<BlockPopup
+					closePopup={closePopup}
+					popupRefCon={popupRefCon}
+					popupRef={popupRef}
+				/>
+			)}
+			{popup === "report" && (
+				<ReportPopup
+					closePopup={closePopup}
+					popupRefCon={popupRefCon}
+					popupRef={popupRef}
+				/>
+			)}
 		</div>
 	);
 }

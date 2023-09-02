@@ -1,11 +1,12 @@
 import Image from "next/image";
-import profile from "../images/profile.png";
+import profile from "../../images/profile.png";
 import { Groups, DataUsage, Chat, MoreVert } from "@mui/icons-material";
-import IconBox from "./iconBox";
+import IconBox from "../iconBox";
 import { createRef, useCallback, useEffect, useRef, useState } from "react";
-import MenuBox from "./menuBox";
-import { addSubRoute } from "@/redux/reducers/routeSlice";
+import MenuBox from "../menuBox";
+import { addSubRoute, changeRoute } from "@/redux/reducers/routeSlice";
 import { useDispatch } from "react-redux";
+import { toggleSelection } from "@/redux/reducers/leftSectSlice";
 
 function SideNavbar() {
 	const dispatch = useDispatch();
@@ -74,6 +75,26 @@ function SideNavbar() {
 		}, 5);
 	};
 
+	const openNewChat = () => {
+		dispatch(addSubRoute("newChat"));
+
+		setTimeout(() => {
+			const chat = document.getElementById("newChat");
+
+			chat!.classList.replace("-translate-x-[100%]", "translate-x-0");
+		}, 5);
+	};
+
+	const openSettings = () => {
+		dispatch(addSubRoute("settings"));
+
+		setTimeout(() => {
+			const settings = document.getElementById("settings");
+
+			settings!.classList.replace("-translate-x-[100%]", "translate-x-0");
+		}, 5);
+	};
+
 	useEffect(() => {
 		window.addEventListener("click", closeMenu);
 
@@ -95,13 +116,13 @@ function SideNavbar() {
 					<Groups sx={{ color: "lightgray", fontSize: "25px" }} />
 				</IconBox>
 
-				<IconBox title="Status" clicked={() => dispatch(addSubRoute("status"))}>
+				<IconBox title="Status" clicked={() => dispatch(changeRoute("status"))}>
 					<DataUsage sx={{ color: "lightgray", fontSize: "21px" }} />
 				</IconBox>
 
 				<IconBox
 					title="New Chat"
-					clicked={() => dispatch(addSubRoute("newChat"))}
+					clicked={openNewChat}
 				>
 					<Chat sx={{ color: "lightgray", fontSize: "21px" }} />
 				</IconBox>
@@ -120,8 +141,8 @@ function SideNavbar() {
 						{ text: "New community" },
 						{ text: "Archived" },
 						{ text: "Starred messages" },
-						{ text: "Select chats" },
-						{ text: "Settings" },
+						{ text: "Select chats", clicked: () => dispatch(toggleSelection(true)) },
+						{ text: "Settings", clicked: openSettings },
 						{ text: "Log out" },
 					]}
 					menuRef={menuRef}

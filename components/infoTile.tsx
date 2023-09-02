@@ -30,7 +30,7 @@ function InfoTile({
 	return (
 		<div
 			onClick={clicked}
-			className={`flex flex-col gap-[5px] py-[18px] pl-[40px] pr-[30px] cursor-pointer ${hover}`}
+			className={`flex flex-col gap-[5px] py-[18px] pl-[40px] pr-[30px] cursor-pointer w-full ${hover}`}
 		>
 			<div className="flex items-center justify-between">
 				<div className="flex items-center gap-[20px]">

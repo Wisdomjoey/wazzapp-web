@@ -7,7 +7,6 @@ import {
 	useEffect,
 	useState,
 	useRef,
-	createRef,
 } from "react";
 
 type Props = {
@@ -71,7 +70,8 @@ function ChatTile({
 	const openMenu = useCallback(
 		(e: MouseEvent<HTMLDivElement, globalThis.MouseEvent>) => {
 			e.preventDefault();
-
+console.log(menuRef)
+console.log(tileRefs)
 			if (!open && menuRef.current !== null) {
 				menuRef.current.classList.replace("hidden", "flex");
 				menuRef.current.style.left = `${e.clientX}px`;
@@ -92,7 +92,6 @@ function ChatTile({
 
 					setTimeout(() => {
 						tileRefs.forEach((val) => {
-							console.log(tileRefs);
 							if (val.current !== null) {
 								val.current.classList.replace("opacity-0", "opacity-100");
 							}
@@ -148,80 +147,86 @@ function ChatTile({
 			<div
 				onClick={clicked}
 				onContextMenu={openMenu}
-				className="flex-1 flex items-center gap-[20px] pl-[15px] cursor-pointer hover:bg-[#ffffff1a]"
+				className="flex items-center gap-[15px] pl-[15px] cursor-pointer"
 				onMouseOver={showSpan ? undefined : showIcon}
 				onMouseLeave={showSpan ? undefined : hideIcon}
 			>
 				{Icon ? (
-					<div className="rounded-[50%] w-[45px] h-[45px] bg-primary flex items-center justify-center">
+					<div className="rounded-[50%] w-[50px] h-[50px] bg-primary flex items-center justify-center">
 						<Icon sx={{ color: "#5C5C5B", fontSize: "25px" }} />
 					</div>
 				) : (
 					<Image
 						src={pic!}
 						alt={"pic"}
-						height={45}
-						width={45}
+						height={50}
+						width={50}
 						className="rounded-[50%]"
 					/>
 				)}
 
-				<div className="flex-1 border-t border-solid border-secondary h-[70px]">
-					<div className="flex flex-col pr-[15px] h-full justify-center gap-[2px]">
-						{text ? (
-							<span className="text-[16px] text-[white] font-normal">
-								{text}
-							</span>
-						) : (
-							<div className="flex items-end justify-between">
-								<p className="text-[16px] text-[white] font-semibold">{name}</p>
+				<div className="overflow-hidden border-b border-solid border-secondary h-[73px] w-full">
+					<div className="flex flex-col pr-[15px] h-full justify-center">
+						<div>
+							{text ? (
+								<span className="text-[16px] text-[white] font-normal">
+									{text}
+								</span>
+							) : (
+								<div className="flex items-end justify-between gap-[5px] mb-[5px]">
+									<p className="text-[18px] text-[white] font-semibold whitespace-nowrap overflow-hidden text-ellipsis flex-1">
+										{name}
+									</p>
 
-								<span className="text-[11px] text-primary">7:15 AM</span>
-							</div>
-						)}
+									<span className="text-[12px] text-primary font-medium">
+										7:15 AM
+									</span>
+								</div>
+							)}
 
-						<div className="flex items-center justify-between gap-[5px] h-[20px]">
-							<div className="flex flex-1 items-center justify-between overflow-hidden gap-[10px]">
-								{showSpan ? (
-									span && <p className="text-[gray] text-[12px]">{span}</p>
-								) : (
-									<>
-										<p className="overflow-hidden text-[12px] w-[200px] text-[white] overflow-ellipsis whitespace-nowrap font-medium opacity-[.9] flex-shrink">
-											{lastMsg}
-										</p>
+							<div className="flex items-center justify-between gap-[5px] h-[20px]">
+								<div className="flex flex-1 items-center justify-between overflow-hidden gap-[10px]">
+									{showSpan ? (
+										span && <p className="text-[gray] text-[12px]">{span}</p>
+									) : (
+										<>
+											<p className="overflow-hidden text-[14px] text-[white] overflow-ellipsis whitespace-nowrap font-medium opacity-[.85]">
+												{lastMsg}
+											</p>
 
-										<div className="flex items-center">
-											{msgCount !== 0 && (
-												<span className="px-[6px] py-[3px] font-medium rounded-[20px] text-[11px] text-darker bg-primary">
-													{msgCount}
-												</span>
-											)}
-										</div>
-									</>
-								)}
-							</div>
+											<div className="flex items-center gap-[5px]">
+												{msgCount !== 0 && (
+													<span className="px-[.25rem] pb-[.13rem] min-w-[1.34rem] min-h-[1.32rem] font-medium rounded-[50%] text-[13px] flex items-center justify-center text-darker bg-primary">
+														{msgCount}
+													</span>
+												)}
+											</div>
+										</>
+									)}
+								</div>
 
-							<div
-								onClick={openMenu}
-								id={`drop${id}`}
-								ref={dropRef}
-								className="w-0 opacity-0 transition-all duration-[.3s] hidden"
-							>
-								<svg
-									viewBox="0 0 19 20"
-									height="20"
-									width="20"
-									preserveAspectRatio="xMidYMid meet"
-									version="1.1"
-									x="0px"
-									y="0px"
-									xmlSpace="preserve"
+								<div
+									onClick={openMenu}
+									id={`drop${id}`}
+									ref={dropRef}
+									className="w-0 opacity-0 transition-all duration-[.3s] hidden"
 								>
-									<path
-										fill="lightgray"
-										d="M3.8,6.7l5.7,5.7l5.7-5.7l1.6,1.6l-7.3,7.2L2.2,8.3L3.8,6.7z"
-									></path>
-								</svg>
+									<svg
+										viewBox="0 0 19 20"
+										height="20"
+										width="20"
+										preserveAspectRatio="xMidYMid meet"
+										version="1.1"
+										x="0px"
+										y="0px"
+										xmlSpace="preserve"
+									>
+										<path
+											fill="lightgray"
+											d="M3.8,6.7l5.7,5.7l5.7-5.7l1.6,1.6l-7.3,7.2L2.2,8.3L3.8,6.7z"
+										></path>
+									</svg>
+								</div>
 							</div>
 						</div>
 					</div>

@@ -1,5 +1,5 @@
 import { Close } from "@mui/icons-material";
-import IconBox from "./iconBox";
+import IconBox from "../iconBox";
 import { changeSect } from "@/redux/reducers/routeSlice";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -40,7 +40,7 @@ function SectNavbar({ title }: { title: string }) {
 				<Close sx={{ fontSize: "22px", color: "white", opacity: ".7" }} />
 			</IconBox>
 
-			<span className="text-[white] text-[15px]">{title}</span>
+			<span className="text-[white] text-[16px]">{title}</span>
 		</nav>
 	);
 }

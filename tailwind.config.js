@@ -15,12 +15,12 @@ module.exports = {
 			},
 		},
 		colors: {
-			primary: "#a3ffea",
-			primaryDark: "#009d79",
-			secondary: "#2d3148",
-			secondaryLight: "#3f4464",
-			secondaryBorder: "#4f5781",
-			darker: "#161824",
+			primary: "rgb(var(--primary) / <alpha-value>)",
+			primaryDark: "rgb(var(--primary-dark) / <alpha-value>)",
+			secondary: "rgb(var(--secondary) / <alpha-value>)",
+			secondaryLight: "rgb(var(--secondary-light) / <alpha-value>)",
+			secondaryBorder: "rgb(var(--secondary-border) / <alpha-value>)",
+			darker: "rgb(var(--darker) / <alpha-value>)",
 		},
 		keyframes: {
 			play: {

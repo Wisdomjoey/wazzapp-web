@@ -47,8 +47,8 @@ function SearchHeader({ showFilter = true, holder, id }: Props) {
 	};
 
 	return (
-		<div className="px-[10px] py-[6px] flex gap-[10px] items-center">
-			<div className="flex-1 h-[32px] rounded-[7px] bg-secondary flex items-center px-[20px] gap-[30px] relative">
+		<div className="px-[10px] py-[8px] flex gap-[10px] items-center w-full">
+			<div className="flex-1 h-[35px] rounded-[7px] bg-secondary flex items-center px-[15px] gap-[30px] relative">
 				<Search
 					id={`searchIcon${id}`}
 					sx={{
@@ -78,7 +78,7 @@ function SearchHeader({ showFilter = true, holder, id }: Props) {
 					id="input"
 					ref={inputRef}
 					type="text"
-					className="flex-1 bg-[transparent] border-none outline-none leading-[2] placeholder:opacity-[.7] text-[13px] text-[lightgray]"
+					className="flex-1 bg-[transparent] border-none outline-none leading-[2] placeholder:opacity-90 text-[15px] text-[lightgray]"
 					placeholder={holder}
 				/>
 			</div>

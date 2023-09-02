@@ -8,19 +8,22 @@ type Props = {
 	time: string;
 	img: StaticImageData;
 	status: Stats[];
+	clicked?: (
+		e: React.MouseEvent<HTMLDivElement, globalThis.MouseEvent>
+	) => void;
 };
 
-function StatusBox({ name, time, img, status, id }: Props) {
+function StatusBox({ name, time, img, status, id, clicked }: Props) {
 	const [array, setArray] = useState("");
 	const [array1, setArray1] = useState("");
 
 	useEffect(() => {
-		const length: number =
+		const length =
 			((2 * 22 * 50) / 7 - status.length * 10) / status.length;
-		let dashArray: string = "";
-		let dashArray1: string = "";
-		const notSeen: number = status.filter((val) => val.seen === false).length;
-		const notSeenLength: number = notSeen * length + notSeen * 10;
+		let dashArray = "";
+		let dashArray1 = "";
+		const notSeen = status.filter((val) => val.seen === false).length;
+		const seenLength = (status.length - notSeen) * length + (status.length - notSeen) * 10;
 
 		if (status.length > 1) {
 			for (let index = 0; index < status.length; index++) {
@@ -33,19 +36,15 @@ function StatusBox({ name, time, img, status, id }: Props) {
 		}
 
 		if (notSeen !== status.length && notSeen > 0) {
-			dashArray1 += `0 ${notSeenLength}`;
-
-			for (let index = 0; index < status.length - notSeen; index++) {
-				dashArray1 += ` ${length} 10`;
-			}
-		} else if (notSeen <= 0) {
-			for (let index = 0; index < status.length; index++) {
-				if (index > 0) {
-					dashArray1 += ` ${length} 10`;
+			for (let index = 0; index < notSeen; index++) {
+				if (index === notSeen - 1) {
+					dashArray1 += `${length} `;
 				} else {
-					dashArray1 += `${length} 10`;
+					dashArray1 += `${length} 10 `;
 				}
 			}
+
+			dashArray1 += `${seenLength + 10}`;
 		}
 
 		setArray(dashArray);
@@ -53,7 +52,10 @@ function StatusBox({ name, time, img, status, id }: Props) {
 	}, [id, status, status.length]);
 
 	return (
-		<div className="flex gap-[15px] items-center cursor-pointer hover:bg-[#ffffff1a] py-[8px] px-[15px]">
+		<div
+			onClick={clicked}
+			className="flex gap-[15px] items-center cursor-pointer hover:bg-[#ffffff1a] py-[8px] px-[15px] w-full"
+		>
 			<div className="w-[50px] h-[50px] relative flex items-center justify-center">
 				<Image
 					alt="Profile pic"
@@ -65,6 +67,7 @@ function StatusBox({ name, time, img, status, id }: Props) {
 
 				{status.length > 0 && (
 					<svg width={50} height={50} viewBox="0 0 104 104">
+					{status.filter((val) => val.seen === true).length > 0 && (
 						<circle
 							cx={52}
 							cy={52}
@@ -75,10 +78,11 @@ function StatusBox({ name, time, img, status, id }: Props) {
 							r={50}
 							strokeDashoffset={"74"}
 							strokeDasharray={array}
-							className="stroke-primaryDark"
+							className="stroke-[#c3c3c3]"
 						/>
+						)}
 
-						{status.filter((val) => val.seen === true).length > 0 && (
+						{status.filter((val) => val.seen === false).length > 0 && (
 							<circle
 								cx={52}
 								cy={52}
@@ -89,7 +93,7 @@ function StatusBox({ name, time, img, status, id }: Props) {
 								r={50}
 								strokeDashoffset={"74"}
 								strokeDasharray={array1}
-								className="stroke-[#c3c3c3]"
+								className="stroke-primaryDark"
 							/>
 						)}
 					</svg>

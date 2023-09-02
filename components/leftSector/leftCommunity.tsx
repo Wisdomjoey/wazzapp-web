@@ -26,13 +26,13 @@ function LeftCommunity() {
 			<NewChatNav text="Communities" clicked={closeCommunity} />
 
 			<div className="h-[calc(100%-120px)] bg-darker p-[30px] flex flex-col items-center">
-				<h1 className="text-[white] font-bold text-[20px]">
+				<h1 className="text-[white] font-bold text-[22px]">
 					Introducing communities
 				</h1>
 
 				<br />
 
-				<span className="text-center text-[#a7a7a7] text-[13px] leading-5 opacity-90">
+				<span className="text-center text-[#a7a7a7] text-[14px] leading-5 opacity-90">
 					Easily organize your related groups and send announcements. Now, your
 					communities, like neighborhoods or schools, can have their own space.
 				</span>

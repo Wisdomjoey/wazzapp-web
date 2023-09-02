@@ -1,4 +1,4 @@
-import SearchHeader from "./searchHeader";
+import SearchHeader from "../searchHeader";
 import SectNavbar from "./sectNavbar";
 
 function SearchMsgs() {

@@ -1,20 +1,61 @@
 import Image from "next/image";
-import profile from "../images/profile.png";
+import profile from "../../images/profile.png";
 import { MoreVert, Search } from "@mui/icons-material";
 import { createRef, useCallback, useEffect, useRef, useState } from "react";
-import IconBox from "./iconBox";
-import MenuBox from "./menuBox";
+import IconBox from "../iconBox";
+import MenuBox from "../menuBox";
 import { useDispatch, useSelector } from "react-redux";
-import { changeSect } from "@/redux/reducers/routeSlice";
+import {
+	addSubRoute,
+	changeSect,
+	removeSubRoute,
+} from "@/redux/reducers/routeSlice";
+import { toggleSelection } from "@/redux/reducers/middleSectSlice";
+import MutePopup from "../popups/mutePopup";
+import ClearPopup from "../popups/clearPopup";
+import ReportPopup from "../popups/reportPopup";
+import BlockPopup from "../popups/blockPopup";
 
 function ChatNavbar() {
 	const routes = useSelector((state) => (state as any).routes);
 	const dispatch = useDispatch();
 	const [open, setOpen] = useState(false);
+	const [popup, setPopup] = useState<string>("");
+	const [muted, setMuted] = useState(false);
+	const popupRef = useRef<HTMLDivElement>(null);
+	const popupRefCon = useRef<HTMLDivElement>(null);
 	const menuRef = useRef<HTMLDivElement>(null);
 	const tileRefs: React.RefObject<HTMLDivElement>[] = Array(9)
 		.fill(null)
 		.map(() => createRef<HTMLDivElement>());
+
+	const openPopup = (popupName: string) => {
+		setPopup(popupName);
+
+		setTimeout(() => {
+			if (popupRef.current !== null && popupRefCon.current !== null) {
+				popupRefCon.current.classList.replace("opacity-0", "opacity-100");
+
+				setTimeout(() => {
+					popupRef.current!.classList.replace("scale-0", "scale-100");
+				}, 100);
+			}
+		}, 5);
+	};
+
+	const closePopup = () => {
+		if (popupRef.current !== null && popupRefCon.current !== null) {
+			popupRef.current.classList.replace("scale-100", "scale-0");
+
+			setTimeout(() => {
+				popupRefCon.current!.classList.replace("opacity-100", "opacity-0");
+
+				setTimeout(() => {
+					setPopup("");
+				}, 100);
+			}, 200);
+		}
+	};
 
 	const openMenu = useCallback(
 		(e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
@@ -67,6 +108,36 @@ function ChatNavbar() {
 		},
 		[open, tileRefs]
 	);
+
+	const closeChat = () => {
+		dispatch(removeSubRoute("chat"));
+		dispatch(addSubRoute("intro"));
+	};
+
+	const closeSideSect = () => {
+		dispatch(changeSect(""));
+
+		const sideSect = document.getElementById("sideSect");
+		const contact = document.getElementById("contact");
+		const search = document.getElementById("searchMsg");
+
+		switch (routes.sideSect) {
+			case "contactInfo":
+				contact!.classList.replace("opacity-100", "opacity-0");
+				break;
+
+			case "searchMsgs":
+				search!.classList.replace("opacity-100", "opacity-0");
+				break;
+
+			default:
+				break;
+		}
+
+		setTimeout(() => {
+			sideSect!.classList.replace("basis-[30%]", "basis-0");
+		}, 100);
+	};
 
 	const openSideSect = (section: string, id: string) => {
 		const side = routes.sideSect;
@@ -123,7 +194,7 @@ function ChatNavbar() {
 		<nav className="w-full h-[60px] bg-secondary flex items-center justify-between px-[20px] gap-[20px]">
 			<div
 				onClick={() => openSideSect("contactInfo", "contact")}
-				className="flex gap-[20px] items-center justify-start flex-1 cursor-pointer"
+				className="flex gap-[20px] items-center justify-start flex-1 cursor-pointer overflow-hidden"
 			>
 				<Image
 					src={profile}
@@ -133,7 +204,11 @@ function ChatNavbar() {
 					className="rounded-[50%]"
 				/>
 
-				<span className="font-semibold text-[15px] text-[white]">Jay Z</span>
+				<div className="w-full overflow-hidden">
+					<span className="font-semibold text-[15px] text-[white] whitespace-nowrap text-ellipsis overflow-hidden block">
+						Jay Z
+					</span>
+				</div>
 			</div>
 
 			<div className="flex items-center gap-[10px] relative">
@@ -157,20 +232,73 @@ function ChatNavbar() {
 					origin="origin-top-right"
 					id="In"
 					links={[
-						{ text: "Contact info" },
-						{ text: "Select messages" },
-						{ text: "Close chat" },
-						{ text: "Mute notifications" },
+						{
+							text: "Contact info",
+							clicked: () => openSideSect("contactInfo", "contact"),
+						},
+						{
+							text: "Select messages",
+							clicked: () => dispatch(toggleSelection(true)),
+						},
+						{
+							text: "Close chat",
+							clicked: () => {
+								closeChat();
+								closeSideSect();
+							},
+						},
+						{ text: "Mute notifications", clicked: () => openPopup("mute") },
 						{ text: "Dissappering messages" },
-						{ text: "Clear messages" },
+						{ text: "Clear messages", clicked: () => openPopup("clear") },
 						{ text: "Delete chat" },
-						{ text: "Report" },
-						{ text: "Block" },
+						{ text: "Report", clicked: () => openPopup("report") },
+						{ text: "Block", clicked: () => openPopup("block") },
 					]}
 					menuRef={menuRef}
 					tileRefs={tileRefs}
 				/>
 			</div>
+
+			{popup === "mute" && (
+				<MutePopup
+					setMuted={setMuted}
+					muted={muted}
+					closePopup={closePopup}
+					popupRefCon={popupRefCon}
+					popupRef={popupRef}
+				/>
+			)}
+
+			{popup === "clear" && (
+				<ClearPopup
+					closePopup={closePopup}
+					popupRefCon={popupRefCon}
+					popupRef={popupRef}
+				/>
+			)}
+
+			{popup === "report" && (
+				<ReportPopup
+					closePopup={closePopup}
+					popupRefCon={popupRefCon}
+					popupRef={popupRef}
+				/>
+			)}
+
+			{popup === "block" && (
+				<BlockPopup
+					closePopup={closePopup}
+					popupRefCon={popupRefCon}
+					popupRef={popupRef}
+				/>
+			)}
+			{popup === "report" && (
+				<ReportPopup
+					closePopup={closePopup}
+					popupRefCon={popupRefCon}
+					popupRef={popupRef}
+				/>
+			)}
 		</nav>
 	);
 }

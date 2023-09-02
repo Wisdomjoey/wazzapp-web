@@ -2,6 +2,17 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+  :root {
+    --primary: 163 255 234;
+    --primary-dark: 0 157 121;
+    --secondary: 45 49 72;
+    --secondary-light: 56 61 88;
+    --secondary-border: 79 87 129;
+    --darker: 22 24 36;
+  }
+}
+
 * {
   margin: 0;
   padding: 0;

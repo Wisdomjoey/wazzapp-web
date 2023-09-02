@@ -1,36 +1,39 @@
 "use client";
 
-import ContactInfo from "@/components/contactInfo";
-import LeftChats from "@/components/leftChats";
-import LeftCommunity from "@/components/leftCommunity";
-import LeftNewChats from "@/components/leftNewChats";
-import LeftStatus from "@/components/leftStatus";
-import RightChatScreen from "@/components/rightChatScreen";
-import RightIntro from "@/components/rightIntro";
-import RightStatus from "@/components/rightStatus";
-import SearchMsgs from "@/components/searchMsgs";
-import StatusView from "@/components/statusView";
+import ContactInfo from "@/components/rightSector/contactInfo";
+import LeftChats from "@/components/leftSector/leftChats";
+import LeftCommunity from "@/components/leftSector/leftCommunity";
+import LeftNewChats from "@/components/leftSector/leftNewChats";
+import LeftStatus from "@/components/leftSector/leftStatus";
+import RightChatScreen from "@/components/middleSector/rightChatScreen";
+import RightIntro from "@/components/middleSector/rightIntro";
+import RightStatus from "@/components/middleSector/rightStatus";
+import SearchMsgs from "@/components/rightSector/searchMsgs";
+import StatusView from "@/components/pages/statusView";
 import { useSelector } from "react-redux";
+import LeftSettings from "@/components/leftSector/leftSettings";
 
 export default function App() {
 	const routes = useSelector((state) => (state as any).routes);
 
 	return (
-		<main id="main" className="h-screen">
+		<main id="main" className="h-screen relative">
 			<div className="h-full flex justify-start bg-darker relative">
 				{["home", "status"].includes(routes.route) && (
 					<>
-						<section id="leftSection" className="basis-[30%] relative">
+						<section id="leftSection" className="basis-[30%] relative overflow-hidden border-r-[1px] border-r-secondaryBorder">
 							{routes.subRoutes.includes("communities") && <LeftCommunity />}
+
+							{routes.subRoutes.includes("settings") && <LeftSettings />}
 
 							{routes.route === "home" && <LeftChats />}
 
-							{routes.subRoutes.includes("newchat") && <LeftNewChats />}
+							{routes.subRoutes.includes("newChat") && <LeftNewChats />}
 
 							{routes.route === "status" && <LeftStatus />}
 						</section>
 
-						<section className="flex-1">
+						<section className="flex-1 overflow-hidden">
 							{routes.route === "home" &&
 								routes.subRoutes.includes("intro") && <RightIntro />}
 

@@ -1,5 +1,5 @@
 import { Close, DataUsage } from "@mui/icons-material";
-import IconBox from "./iconBox";
+import IconBox from "../iconBox";
 import { changeRoute } from "@/redux/reducers/routeSlice";
 import { useDispatch } from "react-redux";
 

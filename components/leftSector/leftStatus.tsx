@@ -2,10 +2,13 @@
 
 import { Status, statuses } from "@/utils/data";
 import StatusBox from "./statusBox";
-import pic from "../images/profile.png";
+import pic from "../../images/profile.png";
 import { useEffect, useState } from "react";
+import { useDispatch } from "react-redux";
+import { changeRoute } from "@/redux/reducers/routeSlice";
 
 function LeftStatus() {
+	const dispatch = useDispatch();
 	const [seen, setSeen] = useState<Status[]>([]);
 	const [notSeen, setNotSeen] = useState<Status[]>([]);
 
@@ -61,6 +64,7 @@ function LeftStatus() {
 									img={e.status.slice(-1)[0].image}
 									status={e.status}
 									id={ind}
+									clicked={() => dispatch(changeRoute("statusView"))}
 								/>
 							))}
 						</div>
